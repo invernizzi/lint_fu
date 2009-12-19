@@ -10,16 +10,22 @@ module LintFu
         @root = path
       end
 
-      def excerpt(file, line, options)
-        blame   = options[:blame] || true
-        context = options[:context] || 3
+      def excerpt(file, line, options={})
+        blame   = options.has_key?(:blame)   ? options[:blame] : true
+        context = options.has_key?(:context) ? options[:context] : 7
 
-        Dir.chdir(root) do
+        Dir.chdir(@root) do
           #find relative_path
           start_line    = line - (context/2)
           end_line      = line + (context/2)
           relative_path = File.relative_path(@root, file)
-          return `git blame --date=short -wL #{start_line},#{end_line} #{relative_path}`
+          output = `git blame --date=short #{blame ? '' : '-s'} -w -L #{start_line},#{end_line} #{relative_path}`
+
+          if $?.success?
+            return output
+          else
+            return ProviderError.new(output)
+          end
         end
       end
     end

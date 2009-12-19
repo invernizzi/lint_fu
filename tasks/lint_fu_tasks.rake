@@ -18,14 +18,24 @@ namespace :lint do
       LintFu::Rails::ControllerVisitor.new(scan, context, f).process(sexp)      
     end
 
+    puts "<html>"
+    puts "<body>"
+    puts "<h1>Rails Security Scan</h1>"
+    puts "<h2>Summary</h2>"
+    puts "<p>#{scan.issues.size} issues found.</p>"
+
+    puts %Q{<h2>Detailed Results</h2>}
     scan.issues.each do |issue|
-      puts '=' * 40
-      puts issue.brief
-      puts word_wrap(issue.detail)
-      puts '-' * 20
-      puts scm.excerpt(file=issue.file, line=issue.line)
-      puts '=' * 40
+      puts %Q{<div class="issue" id="issue_#{issue.hash}">}
+      puts %Q{<h4>#{issue.brief}</h4>}
+      puts %Q{<span class="detail">#{issue.detail}</span>}
+      puts %Q{<code class="issue_excerpt lang_ruby">}
+      puts scm.excerpt(file=issue.file, line=issue.line, :blame=>false)
+      puts "</code>"
+      puts "</div>"
     end
+    puts "</body>"
+    puts "</html>"
   end
 
   private

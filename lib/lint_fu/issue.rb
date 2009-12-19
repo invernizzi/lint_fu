@@ -28,5 +28,9 @@ module LintFu
     def file_basename
       File.basename(file)
     end
+
+    def hash()
+      sexp.hash
+    end
   end
 end

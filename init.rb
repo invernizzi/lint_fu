@@ -1,5 +1,6 @@
 #Required Ruby library elements
 require 'set'
+require 'digest/sha1'
 
 #Required gems
 require 'ruby_parser'

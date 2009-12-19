@@ -5,11 +5,21 @@ class File
     base = File.expand_path(base)
     path = File.expand_path(path)
     raise Errno::ENOENT unless path.index(base) == 0
-    return path[base.length..-1]
+    return path[base.length+1..-1]
+  end
+end
+
+class Symbol
+  def to_ruby_string
+    self.to_s
   end
 end
 
 class Sexp
+  def hash
+    Digest::SHA1.hexdigest(self.to_s)
+  end
+  
   def to_ruby_string
     typ = self[0]
 
@@ -40,6 +50,8 @@ class Sexp
         return self[1].to_s
       when :colon2
         return self[1].to_ruby_string + '::' + self[2].to_ruby_string  
+      when :colon3
+        return '::' + self[1].to_ruby_string
       else
         raise StandardError.new("Sexp cannot be converted to Ruby string " + self.to_s)
     end
