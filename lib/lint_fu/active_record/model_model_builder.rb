@@ -1,15 +1,6 @@
 module LintFu
   module ActiveRecord
-    class Model < ModelElement
-      attr_reader :associations
-
-      def initialize(sexp, namespace=nil)
-        super(sexp, namespace)
-        @associations = {}        
-      end
-    end
-
-    class ModelBuilder < ModelElementBuilder
+    class ModelModelBuilder < ModelElementBuilder
       SINGULAR_ASSOCS = Set.new([:belongs_to, :has_one])
       PLURAL_ASSOCS   = Set.new([:has_many, :has_and_belongs_to_many])
       ASSOCS          = SINGULAR_ASSOCS + PLURAL_ASSOCS
@@ -17,18 +8,18 @@ module LintFu
       #sexp:: [:class, <classname>, <superclass|nil>, <CLASS DEFS>]
       def process_class(sexp)
         unless @current_model_element
-          @current_model_element = Model.new(sexp, self.namespace)
+          @current_model_element = ModelModel.new(sexp, self.namespace)
           did_element = true
         end
 
-        process(sexp[3])
+        ret = super(sexp)
 
         if did_element
           self.model_elements.push @current_model_element
           @current_model_element = nil
         end
 
-        return sexp
+        return ret
       end
 
       #s(:call, nil, :belongs_to, s(:arglist, s(:lit, :relation_name)))

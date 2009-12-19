@@ -1,11 +1,34 @@
 module LintFu
+  # An element of the application model that consists in part of submodels 
+  module SuperModel
+    def submodels
+      return [].freeze unless @submodels
+      @submodels.dup.freeze
+    end
+
+    def each_submodel(&block)
+      @submodels ||= Set.new()
+      @submodels.each(&block)
+    end
+
+    def add_submodel(sub)
+      @submodels ||= Set.new()
+      @submodels << sub
+    end
+
+    def remove_submodel(sub)
+      @submodels ||= Set.new()
+      @submodels.delete sub
+    end
+  end
+
+  # An element of the application model being scanned; generally a class.
   class ModelElement
     attr_reader :supermodel, :modeled_class_name, :modeled_class_superclass_name, :parse_tree
 
+    # DSL command to mark a ModelElement as a container for other ModelElements
     def self.acts_as_supermodel
-      def submodels
-        @submodels ||= Set.new()
-      end
+      include SuperModel
     end
 
     #sexp:: [:class, <classname>, <superclass|nil>, <CLASS DEFS>]
@@ -13,31 +36,17 @@ module LintFu
     def initialize(sexp, namespace=nil)
       @parse_tree = sexp
       if namespace
-        @modeled_class_name = namespace.join('::') + '::' + sexp[1].to_s
+        @modeled_class_name = namespace.join('::') + (namespace.empty? ? '' : '::') + sexp[1].to_s
       else
         @modeled_class_name = sexp[1]
       end
     end
 
+    attr_accessor :supermodel
+    
     #Have a pretty string representation
     def to_s
       "<<model of #{modeled_class_name}>>"
-    end
-
-    # Allow easy declaration and query of predicates (facts) about models.
-    # This allows model elements to treat any method call ending in ? (or !)
-    # as a predicate query (or declaration).
-    def method_missing(meth, *args)
-      @predicates ||= Hash.new(false)
-
-      meth = meth.to_s
-      if meth =~ /\?$/
-        @predicates[ meth[0...-1] ]
-      elsif meth =~ /!$/
-        @predicates[ meth[0...-1] ] = true
-      else
-        super(meth, *args)
-      end
     end
   end
 end

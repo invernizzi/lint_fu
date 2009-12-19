@@ -1,21 +1,13 @@
 module LintFu
   module Rails
-    class Application < ModelElement
-      attr_reader :models
-
-      def initialize
-        @models = Set.new
-      end
-    end
-
-    class ApplicationBuilder
+    class ApplicationModelBuilder
       attr_reader :application
-      
+
       def initialize(rails_root)
-        @application = Application.new
+        @application = ApplicationModel.new
 
         models_dir = File.join(rails_root, 'app', 'models')
-        model_builder = ActiveRecord::ModelBuilder.new
+        model_builder = ActiveRecord::ModelModelBuilder.new
 
         #Parse all of the models and build ModelElements for each
         #TODO ensure the Rails app is using ActiveRecord
@@ -25,9 +17,8 @@ module LintFu
           model_builder.process(sexp)
         end
 
-        model_builder.model_elements.each { |elem| @application.models << elem }
+        model_builder.model_elements.each { |elem| @application.add_submodel(elem) }
       end
-
     end
   end
 end

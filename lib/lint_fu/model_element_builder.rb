@@ -10,16 +10,18 @@ module LintFu
       self.auto_shift_type = false      
     end
 
+    #sexp:: [:module, <modulename>, <:scope - MODULE DEFS>]
     def process_module(sexp)
-      @namespace.push s[1]
-      process(s[2])
+      @namespace.push sexp[1]
+      process(sexp[2])
       @namespace.pop
       return sexp
     end
 
+    #sexp:: [:class, <classname>, <superclass|nil>, <:scope - CLASS DEFS>]
     def process_class(sexp)
-      @namespace.push s[1]
-      process(s[2])
+      @namespace.push sexp[1]
+      process(sexp[3])
       @namespace.pop
       return sexp
     end
