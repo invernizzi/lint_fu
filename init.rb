@@ -5,6 +5,7 @@ require 'digest/sha1'
 #Required gems
 require 'ruby_parser'
 require 'sexp_processor'
+require 'builder'
 
 basedir = File.dirname(__FILE__)
 libdir = File.join(basedir, 'lib')

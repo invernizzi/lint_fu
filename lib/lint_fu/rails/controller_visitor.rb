@@ -2,7 +2,7 @@ module LintFu
   module Rails
     class DirectFinderCall < Issue
       def detail
-        "A controller is calling <code>#{@sexp[1].to_ruby_string}.#{@sexp[2].to_ruby_string}</code> " +
+        "A controller is calling #{@sexp[1].to_ruby_string}.#{@sexp[2].to_ruby_string} " +
         "without scoping it to an account."
       end
     end
