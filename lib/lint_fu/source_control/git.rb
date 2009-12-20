@@ -1,7 +1,7 @@
 module LintFu
   module SourceControl
     class Git < SourceControlProvider
-      BLAME_REGEXP = /^(.*) \((.*)[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}\s+([0-9]+)\)/
+      BLAME_REGEXP = /^(.*) \((.+) [0-9]{4}-[0-9]{1,2}-[0-9]{1,2}\s+([0-9]+)\)/
 
       def initialize(path)
         `git version`
@@ -13,13 +13,13 @@ module LintFu
       end
 
       # ==Return
-      #  An array containing [author,commit_ref]
+      #  An array containing [author, commit_ref]
       def blame(file, line)
         #commit, author, line_no,
         output = `git blame --date=short -w -L #{line} #{file}`
         match = BLAME_REGEXP.match(output)
         if $?.success? && match && (match[3].to_i == line)
-          return [ match[1], match[2] ]
+          return [ match[1].strip, match[2].strip ]
         else
           raise ProviderError, output
         end

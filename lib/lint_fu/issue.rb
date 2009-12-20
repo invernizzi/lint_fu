@@ -30,7 +30,7 @@ module LintFu
     end
 
     def hash()
-      sexp.hash
+      Digest::SHA1.hexdigest("#{self.class.name} - #{self.relative_file} - #{sexp.to_s}")
     end
   end
 end

@@ -16,10 +16,6 @@ class Symbol
 end
 
 class Sexp
-  def hash
-    Digest::SHA1.hexdigest(self.to_s)
-  end
-  
   def to_ruby_string
     typ = self[0]
 
