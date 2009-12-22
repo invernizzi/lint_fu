@@ -16,13 +16,6 @@ module LintFu
 
     def blessed?(sexp, issue_class)
       comments = preceeding_comments(sexp)
-      puts sexp
-      puts "------------"
-      puts comments
-      puts !!(BLESSING_COMMENT.match(comments))
-      puts "------------"
-      puts
-
       return false unless comments
       match = BLESSING_COMMENT.match(comments)
       return false unless match

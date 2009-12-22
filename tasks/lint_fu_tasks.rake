@@ -5,10 +5,10 @@ namespace :lint do
     table { border: 2px solid black }
     th    { color: white; background: black }
     td    { border-right: 1px dotted black; border-bottom: 1px dotted black }
-    h1    { }
-    h2    { font-family: Arial,Helvetica,sans-serif; border-bottom: 1px solid grey }
-    h3    { }
-    h4    { font-family: Arial,Helvetica,sans-serif; border-bottom: 1px dotted grey }
+    h1    { font-family: Arial,Helvetica,sans-serif }
+    h2    { font-family: Arial,Helvetica,sans-serif; color: white; background: black }
+    h3    { font-family: Arial,Helvetica,sans-serif }
+    h4    { border-bottom: 1px dotted grey }
     pre span.issue { background: yellow }
 EOF
   
