@@ -12,13 +12,12 @@ module LintFu
       @sexp.line
     end
 
-    def relative_file()
+    def relative_file
       File.relative_path(@scan.fs_root, file)
     end
 
     def brief
-      relative_path =
-      "#{self.class.name.split('::')[-1].underscore.gsub('_', ' ').titleize} at #{relative_file}:#{line}"
+      self.class.name.split('::')[-1].underscore.gsub('_', ' ').titleize
     end
 
     def detail
