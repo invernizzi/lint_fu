@@ -130,7 +130,7 @@ EOF
           issues = files[file]
           issues.each do |issue|
             body.div(:class=>'issue', :id=>"issue_#{issue.hash}") do |div|
-              div.h4 "#{issue.brief}, line #{issue.line}"
+              div.h4 "#{issue.brief}, #{issue.file_basename}:#{issue.line}"
               div.span(issue.detail, :class=>'detail')
               div.pre(scm.excerpt(issue.file, issue.line, :blame=>false))
             end

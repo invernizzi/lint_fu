@@ -1,6 +1,7 @@
 module LintFu
   class Visitor < SexpProcessor
-    BLESSING_COMMENT = /^\s*#\s*security\s*[:\-]\s*not a?n? ?(.*)/i
+    TERSE_BLESSING_COMMENT   = /^\s*#\s*security\s*[:\-]\s*not\s+a?n? ?(.*)$/i
+    VERBOSE_BLESSING_COMMENT = /^\s*#\s*security\s*[:\-]\s*not\s+a?n? ?(.*)\s+because\s+(.*)$/i
     attr_reader :scan, :analysis_model, :file
     
     def initialize(scan, analysis_model, file=nil)
@@ -17,11 +18,20 @@ module LintFu
     def blessed?(sexp, issue_class)
       comments = preceeding_comments(sexp)
       return false unless comments
-      match = BLESSING_COMMENT.match(comments)
+      match = VERBOSE_BLESSING_COMMENT.match(comments)
+      match = TERSE_BLESSING_COMMENT.match(comments) unless match
       return false unless match
       blessed_issue_class = match[1].downcase.split(/\s+/).join('_').camelize
-      return false unless issue_class.name.index(blessed_issue_class)
-      return true
+
+      #Ascend the class hierarchy of the issue that was found looking for type names
+      #similar to the type that was blessed in the comment.
+      klass = issue_class
+      while klass
+        return true if klass.name.index(blessed_issue_class)
+        klass = klass.superclass
+      end
+
+      return false
     end
 
     def preceeding_comments(sexp)
