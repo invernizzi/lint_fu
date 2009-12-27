@@ -135,9 +135,9 @@ EOF
               div.h4 "#{issue.brief}, line #{issue.line}"
               div.span(issue.detail, :class=>'detail')
 
-              first   = issue.line-2
+              first   = issue.line-3
               first   = 1 if first < 1
-              last    = issue.line + 2
+              last    = issue.line + 3
               excerpt = scm.excerpt(issue.file, (first..last), :blame=>false)
               
               div.pre do |pre|
