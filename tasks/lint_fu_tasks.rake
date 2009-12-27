@@ -19,11 +19,11 @@ EOF
 
     #Build a model of the application we are scanning.
     t0 = Time.now.to_i
-    puts "Building a model of the application (might take awhile)..."
+    puts "Building a model of the application..."
     builder = LintFu::Rails::ApplicationModelBuilder.new(RAILS_ROOT)
     context = builder.application
     t1 = Time.now.to_i
-    puts "(#{t1 - t0} sec) done"
+    puts "(#{t1 - t0} sec) done"; puts
     raise LintFu::ProviderError.new("Unable to identify the source control provider for #{RAILS_ROOT}") unless scm
 
     #Using the model we built, scan the controllers for security bugs.
@@ -36,7 +36,7 @@ EOF
       LintFu::Rails::ControllerVisitor.new(scan, context, f).process(sexp)      
     end
     t1 = Time.now.to_i
-    puts "(#{t1 - t0} sec) done"
+    puts "(#{t1 - t0} sec) done"; puts
 
     #Build map of contributors to issues they created
     t0 = Time.now.to_i
@@ -58,15 +58,15 @@ EOF
     end
     #Sort files in decreasing order of number of issues contained
     files_by_issue_count = files.keys.sort { |x,y| files[y].size <=> files[x].size }
-    #Sort files in increasing order of path
+    #Sort files in increasing lexical order of path
     files_by_name = files.keys.sort { |x,y| x <=> y }
     t1 = Time.now.to_i
-    puts "(#{t1 - t0} sec) done"
+    puts "(#{t1 - t0} sec) done"; puts
 
     puts "Writing report..."
     output_path = File.join(RAILS_ROOT, 'lint_security.html')
     output = File.open(output_path, 'w')
-    x = Builder::XmlMarkup.new(:target => output, :indent => 2)
+    x = Builder::XmlMarkup.new(:target => output, :indent => 0)
     x.html do |html|
       html.head do |head|
         head.title 'Rails Security Scan'
@@ -127,19 +127,37 @@ EOF
         body.h1 'Detailed Results'
         files_by_name.each do |file|
           body.h2 file
+          
           issues = files[file]
+          issues = issues.to_a.sort { |x,y| x.line <=> y.line }
           issues.each do |issue|
             body.div(:class=>'issue', :id=>"issue_#{issue.hash}") do |div|
-              div.h4 "#{issue.brief}, #{issue.file_basename}:#{issue.line}"
+              div.h4 "#{issue.brief}, line #{issue.line}"
               div.span(issue.detail, :class=>'detail')
-              div.pre(scm.excerpt(issue.file, issue.line, :blame=>false))
+
+              first   = issue.line-2
+              first   = 1 if first < 1
+              last    = issue.line + 2
+              excerpt = scm.excerpt(issue.file, (first..last), :blame=>false)
+              
+              div.pre do |pre|
+                counter = first
+                excerpt.each do |line|
+                  if counter == issue.line
+                    pre.span(line, :class=>'issue')
+                  else
+                    pre.text! line
+                  end
+                  counter += 1
+                end
+              end
             end
           end
         end
 
       end
     end
-    puts "(#{t1 - t0} sec) done"
+    puts "(#{t1 - t0} sec) done"; puts
   end
 
   private

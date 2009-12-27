@@ -4,12 +4,13 @@ module LintFu
       BLAME_REGEXP = /^(.*) \((.+) [0-9]{4}-[0-9]{1,2}-[0-9]{1,2}\s+([0-9]+)\)/
 
       def initialize(path)
+        super(path)
+
         `git version`
         raise ProviderNotInstalled, self unless $?.success?
 
         dot_git = File.join(path, '.git')
         raise ProviderError.new(self, path) unless File.directory?(dot_git)
-        @root = path
       end
 
       # ==Return
@@ -25,14 +26,14 @@ module LintFu
         end
       end
 
-      def excerpt(file, line, options={})
+      def excerpt(file, range, options={})
         blame   = options.has_key?(:blame)   ? options[:blame] : true
-        context = options.has_key?(:context) ? options[:context] : 7
+
+        return super unless blame 
 
         Dir.chdir(@root) do
-          start_line    = line - (context/2)
-          start_line    = 1 if start_line < 1
-          end_line      = line + (context/2)
+          start_line = range.first
+          end_line   = range.last
           relative_path = File.relative_path(@root, file)
 
           output = `git blame --date=short #{blame ? '' : '-s'} -w -L #{start_line},#{end_line} #{relative_path} 2> /dev/null`
@@ -42,7 +43,7 @@ module LintFu
           file_length = `wc -l #{relative_path}`.split[0].to_i
           end_line = file_length
           output = `git blame --date=short #{blame ? '' : '-s'} -w -L #{start_line},#{end_line} #{relative_path}`
-          return output if $?.success?
+          return output.split("\n") if $?.success?
 
           raise ProviderError.new("'git blame' failed with code #{$?.to_i}: #{output}")
         end

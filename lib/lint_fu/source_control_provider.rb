@@ -1,10 +1,4 @@
 module LintFu
-  class ProviderNotInstalled < Exception
-    def initialize(provider)
-      super("The #{provider.name} source control provider does not seem to be installed on this system.")
-    end
-  end
-
   class ProviderError < Exception
     def initialize(*args)
       if args.length == 2 && args[0].kind_of?(LintFu::SourceControlProvider)
@@ -14,6 +8,12 @@ module LintFu
       else
         super(*args)
       end
+    end
+  end
+
+  class ProviderNotInstalled < ProviderError
+    def initialize(provider)
+      super("The #{provider.name} source control provider does not seem to be installed on this system.")
     end
   end
 
@@ -36,6 +36,23 @@ module LintFu
       end
 
       return nil
+    end
+    
+    def initialize(path)
+      @root = path
+    end
+
+    def excerpt(file, range, options={})
+      blame   = options.has_key?(:blame)   ? options[:blame] : true
+      raise ProviderError, "Blame is not supported for this source control provider" if blame
+
+      Dir.chdir(@root) do
+        start_line = range.first
+        end_line   = range.last
+        io         = File.open(File.relative_path(@root, file), 'r')
+        lines      = io.readlines
+        return lines[(start_line-1)..(end_line-1)]
+      end
     end
   end
 end
