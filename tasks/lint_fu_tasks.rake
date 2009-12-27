@@ -93,6 +93,7 @@ EOF
                 tr.td do |td|
                   files[file].each do |issue|
                     td.a(issue.hash[0..4], :href=>"#issue_#{issue.hash}")
+                    td.text!('&nbsp;')
                   end
                 end
               end
@@ -117,6 +118,7 @@ EOF
                 tr.td do |td|
                   authors[author].each do |issue|
                     td.a(issue.hash[0..4], :href=>"#issue_#{issue.hash}")
+                    td.text!('&nbsp;')
                   end
                 end
               end
