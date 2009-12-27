@@ -1,6 +1,8 @@
 module LintFu
   class Visitor < SexpProcessor
-    BLESSING_COMMENT = /^\s*#\s*security\s*[:\-]\s*not a?n? ?(.*)/i
+    VERBOSE_BLESSING_COMMENT = /^\s*#\s*security\s*-\s*not a?n? ?(.*) because (.*)/i
+    BLESSING_COMMENT         = /^\s*#\s*security\s*-\s*not a?n? ?(.*)/i
+
     attr_reader :scan, :analysis_model, :file
     
     def initialize(scan, analysis_model, file=nil)
@@ -17,7 +19,8 @@ module LintFu
     def blessed?(sexp, issue_class)
       comments = preceeding_comments(sexp)
       return false unless comments
-      match = BLESSING_COMMENT.match(comments)
+      match = VERBOSE_BLESSING_COMMENT.match(comments)
+      match = BLESSING_COMMENT.match(comments) unless match
       return false unless match
       blessed_issue_class = match[1].downcase.split(/\s+/).join('_').camelize
       return false unless issue_class.name.index(blessed_issue_class)
