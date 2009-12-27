@@ -63,6 +63,8 @@ EOF
     t1 = Time.now.to_i
     puts "(#{t1 - t0} sec) done"; puts
 
+    #Write the report in HTML format
+    t0 = Time.now.to_i
     puts "Writing report..."
     output_path = File.join(RAILS_ROOT, 'lint_security.html')
     output = File.open(output_path, 'w')
@@ -93,7 +95,7 @@ EOF
                 tr.td do |td|
                   files[file].each do |issue|
                     td.a(issue.hash[0..4], :href=>"#issue_#{issue.hash}")
-                    td.text!('&nbsp;')
+                    td.text!(' ')
                   end
                 end
               end
@@ -118,7 +120,7 @@ EOF
                 tr.td do |td|
                   authors[author].each do |issue|
                     td.a(issue.hash[0..4], :href=>"#issue_#{issue.hash}")
-                    td.text!('&nbsp;')
+                    td.text!(' ')
                   end
                 end
               end
