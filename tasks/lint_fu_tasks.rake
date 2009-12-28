@@ -78,31 +78,6 @@ EOF
         body.h1 'Summary'
         body.p "#{scan.issues.size} issues found."
 
-        body.h2 'Issues by File'
-        body.table do |table|
-          table.thead do |thead|
-            thead.tr do |tr|
-              tr.th 'File'
-              tr.th '#'
-              tr.th 'Issues'
-            end
-          end
-          table.tbody do |tbody|
-            files_by_issue_count.each do |file|
-              tbody.tr do |tr|
-                tr.td(file)
-                tr.td(files[file].size.to_s)
-                tr.td do |td|
-                  files[file].each do |issue|
-                    td.a(issue.hash[0..4], :href=>"#issue_#{issue.hash}")
-                    td.text!(' ')
-                  end
-                end
-              end
-            end
-          end
-        end
-        
         body.h2 'Issues by Contributor'
         body.table do |table|
           table.thead do |thead|
@@ -119,6 +94,31 @@ EOF
                 tr.td(authors[author].size.to_s)
                 tr.td do |td|
                   authors[author].each do |issue|
+                    td.a(issue.hash[0..4], :href=>"#issue_#{issue.hash}")
+                    td.text!(' ')
+                  end
+                end
+              end
+            end
+          end
+        end
+
+        body.h2 'Issues by File'
+        body.table do |table|
+          table.thead do |thead|
+            thead.tr do |tr|
+              tr.th 'File'
+              tr.th '#'
+              tr.th 'Issues'
+            end
+          end
+          table.tbody do |tbody|
+            files_by_issue_count.each do |file|
+              tbody.tr do |tr|
+                tr.td(file)
+                tr.td(files[file].size.to_s)
+                tr.td do |td|
+                  files[file].each do |issue|
                     td.a(issue.hash[0..4], :href=>"#issue_#{issue.hash}")
                     td.text!(' ')
                   end

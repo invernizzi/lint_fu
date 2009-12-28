@@ -21,10 +21,19 @@ module LintFu
       return false unless comments
       match = VERBOSE_BLESSING_COMMENT.match(comments)
       match = BLESSING_COMMENT.match(comments) unless match
+
       return false unless match
       blessed_issue_class = match[1].downcase.split(/\s+/).join('_').camelize
-      return false unless issue_class.name.index(blessed_issue_class)
-      return true
+
+      # Determine whether the blessed issue class appears anywhere in the class hierarchy of
+      # issue_class.
+      klass = issue_class
+      while klass
+        return true if klass.name.index(blessed_issue_class)
+        klass = klass.superclass
+      end
+
+      return false
     end
 
     def preceeding_comments(sexp)
