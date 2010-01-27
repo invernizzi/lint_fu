@@ -1,5 +1,7 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'init.rb'))
 
+require 'composite_sexp_processor'
+
 namespace :lint do
   STYLESHEET = <<-EOF
     table { border: 2px solid black }
@@ -11,11 +13,18 @@ namespace :lint do
     h4    { border-bottom: 1px dotted grey }
     pre span.issue { background: yellow }
 EOF
-  
-  desc "Scan the application for common security defects"
-  task "security" do
-    scan    = LintFu::Scan.new(RAILS_ROOT)
-    scm     = LintFu::SourceControlProvider.for_directory(RAILS_ROOT)
+
+  desc 'Scan the application for common security defects'
+  task 'security' do
+    scan, scm = perform_scan([LintFu::Rails::UnsafeFindVisitor])
+    output_file = File.join(RAILS_ROOT, 'lint_security.html')
+    write_report(scan, scm, output_file)
+  end
+
+  private
+  def perform_scan(controller_visitors)
+    scan = LintFu::Scan.new(RAILS_ROOT)
+    scm  = LintFu::SourceControlProvider.for_directory(RAILS_ROOT)
 
     #Build a model of the application we are scanning.
     t0 = Time.now.to_i
@@ -30,14 +39,21 @@ EOF
     puts "Scanning controllers..."
     t0 = Time.now.to_i
     controllers_dir = File.join(RAILS_ROOT, 'app', 'controllers')
-    Dir.glob(File.join(controllers_dir, '**', '*.rb')).each do |f|
-      contents = File.read(f)
+    Dir.glob(File.join(controllers_dir, '**', '*.rb')).each do |filename|
+      contents = File.read(filename)
       sexp = RubyParser.new.parse(contents)
-      LintFu::Rails::ControllerVisitor.new(scan, context, f).process(sexp)      
+
+      processor = CompositeSexpProcessor.new
+      controller_visitors.each { |klass| processor << klass.new(scan, context, filename) }
+      processor.process(sexp)      
     end
     t1 = Time.now.to_i
     puts "(#{t1 - t0} sec) done"; puts
 
+    return [scan, scm]
+  end
+
+  def write_report(scan, scm, output_file)
     #Build map of contributors to issues they created
     t0 = Time.now.to_i
     puts "Preparing report..."
@@ -66,8 +82,8 @@ EOF
     #Write the report in HTML format
     t0 = Time.now.to_i
     puts "Writing report..."
-    output_path = File.join(RAILS_ROOT, 'lint_security.html')
-    output = File.open(output_path, 'w')
+
+    output = File.open(output_file, 'w')
     x = Builder::XmlMarkup.new(:target => output, :indent => 0)
     x.html do |html|
       html.head do |head|
@@ -131,7 +147,7 @@ EOF
         body.h1 'Detailed Results'
         files_by_name.each do |file|
           body.h2 file
-          
+
           issues = files[file]
           issues = issues.to_a.sort { |x,y| x.line <=> y.line }
           issues.each do |issue|
@@ -143,7 +159,7 @@ EOF
               first   = 1 if first < 1
               last    = issue.line + 3
               excerpt = scm.excerpt(issue.file, (first..last), :blame=>false)
-              
+
               div.pre do |pre|
                 counter = first
                 excerpt.each do |line|
@@ -161,11 +177,7 @@ EOF
 
       end
     end
-    puts "(#{t1 - t0} sec) done"; puts
-  end
 
-  private
-  def word_wrap(str, len=60)
-    str.gsub(/\t/,"     ").gsub(/.{1,78}(?:\s|\Z)/){($& + 5.chr).gsub(/\n\005/,"\n").gsub(/\005/,"\n")}
+    puts "(#{t1 - t0} sec) done"; puts
   end
 end

@@ -1,6 +1,6 @@
 module LintFu
   module Rails
-    class DirectFinderCall < Issue
+    class UnsafeFind < Issue
       def detail
         "A controller may be calling #{@sexp[1].to_ruby_string}.#{@sexp[2].to_ruby_string} " +
         "without scoping it to an account."
@@ -8,7 +8,7 @@ module LintFu
     end
     
     # Visit a Rails controller looking for troublesome stuff
-    class ControllerVisitor < Visitor
+    class UnsafeFindVisitor < Visitor
       FINDER_REGEXP  = /^(find|first|all)(_or_initialize)?(_by_.*_id)?/
 
       #sexp:: s(:class, <class_name>, <superclass>, s(:scope, <class_definition>))
@@ -37,8 +37,8 @@ module LintFu
           type = self.analysis_model.models.detect { |m| m.modeled_class_name == name }
           call = sexp[2].to_s
 
-          if finder_call?(type, call) && !sexp_contains_scope?(sexp[3]) && !blessed?(sexp, DirectFinderCall)
-            i = DirectFinderCall.new(scan, self.file, sexp)
+          if finder_call?(type, call) && !sexp_contains_scope?(sexp[3]) && !blessed?(sexp, UnsafeFind)
+            i = UnsafeFind.new(scan, self.file, sexp)
             scan.issues << i
           end
         end        

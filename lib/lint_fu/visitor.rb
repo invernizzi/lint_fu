@@ -1,7 +1,7 @@
 module LintFu
   class Visitor < SexpProcessor
     COMMENT                  = /^\s*#/
-    VERBOSE_BLESSING_COMMENT = /#\s*security\s*[-:]\s*not\s*a?n?\s*(.*) because (.*)/i
+    VERBOSE_BLESSING_COMMENT = /#\s*security\s*[-:]\s*not\s*a?n?\s*(.*) ?(because|;)\s*(.*)/i
     BLESSING_COMMENT         = /#\s*security\s*[-:]\s*not\s*a?n?\s*(.*)/i
 
     attr_reader :scan, :analysis_model, :file
