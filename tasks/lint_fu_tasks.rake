@@ -152,7 +152,7 @@ EOF
           issues = issues.to_a.sort { |x,y| x.line <=> y.line }
           issues.each do |issue|
             body.div(:class=>'issue', :id=>"issue_#{issue.hash}") do |div|
-              div.h4 "#{issue.brief}, line #{issue.line}"
+              div.h4 "#{issue.brief}, #{File.basename(issue.file)} line #{issue.line}"
               div.span(issue.detail, :class=>'detail')
 
               first   = issue.line-3
