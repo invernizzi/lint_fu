@@ -16,6 +16,7 @@ class Symbol
 end
 
 class Sexp
+  #Generate a human-readable description for this sexp that is similar to source code.
   def to_ruby_string
     typ = self[0]
 
@@ -53,7 +54,8 @@ class Sexp
     end
   end
 
-  def to_ruby
+  # Translate a sexp containing a Ruby data literal (string, int, array, hash, etc) into the equivalent Ruby object.
+  def to_ruby(options={})
     typ = self[0]
 
     case typ
@@ -63,8 +65,8 @@ class Sexp
         return false
       when :lit, :str
         return self[1]
-      when :array
-        return self[1..-1].collect { |x| x.to_ruby }
+      when :array, :arglist
+        return self[1..-1].collect { |x| x.to_ruby(options) }
       when :hash
         result = {}
         key, value = nil, nil
@@ -72,7 +74,7 @@ class Sexp
         self[1..-1].each do |token|
           if flipflop
             value = token
-            result[key.to_ruby] = value.to_ruby
+            result[key.to_ruby(options)] = value.to_ruby(options)
           else
             key = token
           end
@@ -80,7 +82,8 @@ class Sexp
         end
         return result
       else
-        raise StandardError.new("Sexp cannot be converted to Ruby data " + self.to_s)
+        return options[:partial] if options.has_key?(:partial)
+        raise StandardError.new("Cannot convert Sexp to Ruby object: " + self.to_s)
     end
   end
 end

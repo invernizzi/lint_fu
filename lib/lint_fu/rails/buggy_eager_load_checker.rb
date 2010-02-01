@@ -3,8 +3,8 @@ module LintFu
     class BuggyEagerLoad < Issue
       def detail
         "A find is attempting to eager-load an associated model that acts as paranoid. " +
-        "When Rails uses a join strategy to eager-load, a bug in the plugin will cause ALL " +
-        "associated models to load, even deleted ones!"
+        "THIS WILL CAUSE A BUG for :has_many associations when Rails falls back to JOIN " +
+        "eager loading. Deleted models will return to life."
       end
     end
     
@@ -14,7 +14,7 @@ module LintFu
 
       #sexp:: s(:call, <target>, <method_name>, s(:arglist))
       def observe_call(sexp)
-        if finder?(sexp) && (spotty = spotty_includes(sexp)) && !blessed?(sexp, UnsafeFind)
+        if finder?(sexp) && (spotty = spotty_includes(sexp[3])) && !blessed?(sexp, UnsafeFind)
           scan.issues << BuggyEagerLoad.new(scan, self.file, sexp)
         end
       end
@@ -22,16 +22,24 @@ module LintFu
       protected
 
       def finder?(sexp)
-        sexp[2] =~ FINDER_REGEXP
+        !!(sexp[2].to_s =~ FINDER_REGEXP)
       end
 
       def spotty_includes(sexp)
-        arglist = s[3] && s[3].to_ruby
+        arglist = ( sexp && (sexp[0] == :arglist) && sexp.to_ruby(:partial=>nil) )
         return nil unless arglist
         return nil unless arglist.last.is_a?(Hash) && arglist.last.has_key?(:include)
-        gather_includes(arglist.last[:include]).each do |include|
-          type = self.analysis_model.models.detect { |m| m.modeled_class_name == name }
-          if type && type.paranoid?
+#        puts "Observing #{sexp}"
+#        puts "----"
+#        puts "It has an arglist like {:include=>foo} !!"
+#        puts gather_includes(arglist.last[:include]).inspect  
+        gather_includes(arglist.last[:include]).each do |inc|
+          plural     = inc.to_s
+          singular   = plural.singularize
+          class_name = singular.camelize
+          type = self.analysis_model.models.detect { |m| m.modeled_class_name == class_name }
+          # TODO replace this clever hack, which infers :has_many associations using plural/singular word comparison
+          if !type || ( type.paranoid? && (plural != singular) )
             return type
           end
         end

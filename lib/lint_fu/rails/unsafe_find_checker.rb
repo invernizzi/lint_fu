@@ -7,7 +7,8 @@ module LintFu
         else
           info = "an ActiveRecord finder"
         end
-        "A controller may be calling #{info} without scoping it to an account."
+
+        "A controller may be calling #{info} without scoping it to an account. "
       end
     end
     
