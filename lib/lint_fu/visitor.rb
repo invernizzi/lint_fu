@@ -1,66 +1,36 @@
 module LintFu
-  class Visitor < SexpProcessor
-    COMMENT                  = /^\s*#/
-    VERBOSE_BLESSING_COMMENT = /#\s*security\s*[-:]\s*not\s*a?n?\s*(.*) ?(because|;)\s*(.*)/i
-    BLESSING_COMMENT         = /#\s*security\s*[-:]\s*not\s*a?n?\s*(.*)/i
-
-    attr_reader :scan, :analysis_model, :file
+  class GenericVisitor < SexpProcessor
+    attr_reader :observers
     
-    def initialize(scan, analysis_model, file=nil)
-      super()
+    def initialize
+      super
       self.require_empty   = false
       self.auto_shift_type = false
-      @scan           = scan
-      @analysis_model = analysis_model
-      @file           = file
+      @observers      = []
     end
 
-    protected
+    def process(sexp)
+      tag = sexp[0]
 
-    def blessed?(sexp, issue_class)
-      comments = preceeding_comments(sexp)
-      return false unless comments
+      begin_meth  = "observe_#{tag}_begin".to_sym
+      around_meth = "observe_#{tag}".to_sym
+      end_meth    = "observe_#{tag}_end".to_sym
 
-      match = nil
-      comments.each do |line|
-        match = VERBOSE_BLESSING_COMMENT.match(line)
-        match = BLESSING_COMMENT.match(line) unless match
-        break if match
+      observers.each do |o|
+        o.__send__(begin_meth, sexp) if o.respond_to?(begin_meth)
       end
 
-      return false unless match
-      blessed_issue_class = match[1].downcase.split(/\s+/).join('_').camelize
-
-      # Determine whether the blessed issue class appears anywhere in the class hierarchy of
-      # issue_class.
-      klass = issue_class
-      while klass
-        return true if klass.name.index(blessed_issue_class)
-        klass = klass.superclass
+      observers.each do |o|
+        o.__send__(around_meth, sexp) if o.respond_to?(around_meth)
       end
 
-      return false
-    end
+      result = super(sexp)
 
-    def preceeding_comments(sexp)
-      @file_contents ||= File.readlines(self.file)
-
-      comments = ''
-
-      max_line = sexp.line - 1 - 1
-      max_line = 0 if max_line < 0
-      min_line = max_line
-
-      while @file_contents[min_line] =~ COMMENT && min_line >= 0
-        min_line -= 1
+      observers.each do |o|
+        o.__send__(end_meth, sexp) if o.respond_to?(end_meth)
       end
 
-      if @file_contents[max_line] =~ COMMENT
-        min_line +=1 unless min_line == max_line
-        return @file_contents[min_line..max_line]
-      else
-        return nil
-      end
+      return result
     end
   end
 end

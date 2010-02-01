@@ -16,13 +16,13 @@ EOF
 
   desc 'Scan the application for common security defects'
   task 'security' do
-    scan, scm = perform_scan([LintFu::Rails::UnsafeFindVisitor])
+    scan, scm = perform_scan([LintFu::Rails::UnsafeFindChecker, LintFu::Rails::BuggyEagerLoadChecker])
     output_file = File.join(RAILS_ROOT, 'lint_security.html')
     write_report(scan, scm, output_file)
   end
 
   private
-  def perform_scan(controller_visitors)
+  def perform_scan(controller_checkers)
     scan = LintFu::Scan.new(RAILS_ROOT)
     scm  = LintFu::SourceControlProvider.for_directory(RAILS_ROOT)
 
@@ -42,10 +42,9 @@ EOF
     Dir.glob(File.join(controllers_dir, '**', '*.rb')).each do |filename|
       contents = File.read(filename)
       sexp = RubyParser.new.parse(contents)
-
-      processor = CompositeSexpProcessor.new
-      controller_visitors.each { |klass| processor << klass.new(scan, context, filename) }
-      processor.process(sexp)      
+      visitor = LintFu::GenericVisitor.new
+      controller_checkers.each { |klass| visitor.observers << klass.new(scan, context, filename) }
+      visitor.process(sexp)      
     end
     t1 = Time.now.to_i
     puts "(#{t1 - t0} sec) done"; puts
