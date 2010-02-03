@@ -42,13 +42,13 @@ module LintFu
           type = self.analysis_model.models.detect { |m| m.modeled_class_name == name }
           call = sexp[2].to_s
 
-          if finder_call?(type, call) && !sexp_contains_scope?(sexp[3]) && !blessed?(sexp, UnsafeFind)
+          if finder?(type, call) && !sexp[3].constant? && !sexp_contains_scope?(sexp[3]) && !blessed?(sexp, UnsafeFind)
             scan.issues << UnsafeFind.new(scan, self.file, sexp)
           end
         end        
       end
 
-      def finder_call?(type, call)
+      def finder?(type, call)
         type.kind_of?(LintFu::ActiveRecord::ModelModel) &&
                      ( call =~ FINDER_REGEXP || type.associations.has_key?(call) )
       end

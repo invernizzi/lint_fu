@@ -27,12 +27,15 @@ module LintFu
 
       def spotty_includes(sexp)
         arglist = ( sexp && (sexp[0] == :arglist) && sexp.to_ruby(:partial=>nil) )
+        #no dice unless we're looking at an arglist
         return nil unless arglist
+
+        #if the finder's options hash is entirely constant, ba da bing
+        return nil if sexp.size <= 1 || sexp.last.constant?
+
+        #no eager loading? no problem!
         return nil unless arglist.last.is_a?(Hash) && arglist.last.has_key?(:include)
-#        puts "Observing #{sexp}"
-#        puts "----"
-#        puts "It has an arglist like {:include=>foo} !!"
-#        puts gather_includes(arglist.last[:include]).inspect  
+        
         gather_includes(arglist.last[:include]).each do |inc|
           plural     = inc.to_s
           singular   = plural.singularize

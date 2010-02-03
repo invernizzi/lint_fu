@@ -86,4 +86,32 @@ class Sexp
         raise StandardError.new("Cannot convert Sexp to Ruby object: " + self.to_s)
     end
   end
+
+  def constant?
+    typ = self[0]
+
+    case typ
+      when :true, :false, :lit, :str
+        return true
+      when :array, :arglist
+        self[1..-1].each { |sexp| return false unless sexp.constant? }
+        return true
+      when :hash
+        result = {}
+        key, value = nil, nil
+        flipflop = false
+        self[1..-1].each do |token|
+          if flipflop
+            value = token
+            return false unless key.constant? && value.constant?
+          else
+            key = token
+          end
+          flipflop = !flipflop
+        end
+        return true
+      else
+        return false
+    end
+  end
 end
