@@ -1,8 +1,8 @@
 module LintFu
   class Checker
     COMMENT                  = /^\s*#/
-    VERBOSE_BLESSING_COMMENT = /#\s*security\s*[-:]\s*not\s*a?n?\s*(.*) ?(because|;)\s*(.*)/i
-    BLESSING_COMMENT         = /#\s*security\s*[-:]\s*not\s*a?n?\s*(.*)/i
+    VERBOSE_BLESSING_COMMENT = /#\s*security\s*[-:]\s*not\s*a?n?\s*([a-z0-9 ]*) ?(because|;)\s*(.*)/i
+    BLESSING_COMMENT         = /#\s*security\s*[-:]\s*not\s*a?n?\s*([a-z0-9 ]*)/i
 
     attr_reader :scan, :analysis_model, :file
 
