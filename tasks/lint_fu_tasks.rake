@@ -7,7 +7,8 @@ task :lint do
   scan, scm = perform_scan([LintFu::Rails::UnsafeFindChecker, LintFu::Rails::BuggyEagerLoadChecker])
 
   flavor = ENV['FORMAT'] || 'html'
-
+  action = ENV['ACTION'] || 'open'
+  
   case flavor
     when 'html'
       output_name = File.join(RAILS_ROOT, 'lint.html')
@@ -23,7 +24,12 @@ task :lint do
   klass    = LintFu.const_get(typename.to_sym)
   klass.new(scan, scm).generate(output)
 
-  system("open #{output_name}") if (output != STDOUT && STDOUT.tty?)
+  case action
+    when 'open'
+      system("open #{output_name}") if (output != STDOUT && STDOUT.tty?)
+    when 'status'
+      exit( [scan.issues.size, 255].min )
+  end
 end
 
 private
