@@ -179,11 +179,9 @@ module LintFu
       counter = 1
 
       scan.issues.each do |issue|
-        commit, author = scm.blame(issue.relative_file, issue.line)
-        output_stream.puts "#{counter}) Error:"
-        output_stream.puts issue.brief
-        output_stream.puts issue.detail
-        output_stream.puts "Introduced by #{author} in #{commit}"
+        #commit, author = scm.blame(issue.relative_file, issue.line)
+        output_stream.puts " #{counter}) Failure:"
+        output_stream.puts "#{issue.brief}, #{issue.relative_file}:#{issue.line}"
         output_stream.puts
         output_stream.puts
         counter += 1
