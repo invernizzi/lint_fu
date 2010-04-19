@@ -8,7 +8,23 @@ module LintFu
           info = "an ActiveRecord finder"
         end
 
-        "A controller may be calling #{info} without scoping it to an account. "
+        "A controller is directly calling #{info}; the results may not be properly scoped or authorized."
+      end
+      
+      def reference_info
+        return <<-EOF
+          An unsafe find happens when a controller makes an ActiveRecord query without performing
+          an authorization check to determine whether the logged-in user is authorized to view
+          and/or manipulate the resulting models.
+
+          It is not trivial to determine whether a find is safe, because authorization can happen
+          in many ways and the "right" way to do it depends on the application requirements. Here
+          are some things to consider when evaluating whether a find is safe:
+          * Do the find's conditions scope it in some way to current_user or current_account?
+          * How will the results be used? What information is displayed in the view?
+          * Are the results scoped afterward, e.g. by calling #select on the result set?
+          * Is authorization checked afterward, e.g. by checking ownership and raising ActiveRecord::NotFound?
+        EOF
       end
     end
     

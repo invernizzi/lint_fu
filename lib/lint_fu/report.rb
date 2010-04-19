@@ -75,7 +75,10 @@ module LintFu
               end
               @issues_by_class.each_pair do |klass, issues|
                 table.tr do |tr|
-                  tr.td(klass.name.split('::').last.underscore.humanize)
+                  sample_issue = issues.first
+                  tr.td do |td|
+                    td.a(sample_issue.brief, :href=>"##{id_for_issue_class(sample_issue.class)}")
+                  end
                   tr.td(issues.size.to_s)
                   tr.td do |td|
                     issues.each do |issue|
@@ -146,7 +149,10 @@ module LintFu
             issues = issues.to_a.sort { |x,y| x.line <=> y.line }
             issues.each do |issue|
               body.div(:class=>'issue', :id=>"issue_#{issue.hash}") do |div|
-                div.h4 "#{issue.brief}, #{File.basename(issue.file)} line #{issue.line}"
+                div.h4 do |h4|
+                  h4.a(issue.brief, :href=>"##{id_for_issue_class(issue.class)}")
+                  h4.text! ", #{File.basename(issue.file)}:#{issue.line}"
+                end
                 div.span(issue.detail, :class=>'detail')
 
                 first   = issue.line-3
@@ -169,8 +175,22 @@ module LintFu
             end
           end
 
+          body.h1 'Reference Information'
+          @issues_by_class.values.each do |array|
+            sample_issue = array.first
+            body.h2 sample_issue.brief
+            body.div(:id=>id_for_issue_class(sample_issue.class)) do |div|
+              div << RedCloth.new(sample_issue.reference_info).to_html 
+            end
+          end
         end
       end
+    end
+
+    private
+
+    def id_for_issue_class(klass)
+      "reference_#{klass.name.split('::')[-1].underscore}"      
     end
   end
 

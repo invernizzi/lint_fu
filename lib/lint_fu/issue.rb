@@ -24,6 +24,10 @@ module LintFu
       "There is an issue at #{file_basename}:#{line}."
     end
 
+    def reference_info
+      "No reference information is available for #{brief}."
+    end
+
     def file_basename
       File.basename(file)
     end

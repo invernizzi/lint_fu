@@ -2,9 +2,29 @@ module LintFu
   module Rails
     class BuggyEagerLoad < Issue
       def detail
-        "A find is attempting to eager-load an associated model that acts as paranoid. " +
-        "THIS WILL CAUSE A BUG for :has_many associations when Rails falls back to JOIN " +
-        "eager loading. Deleted models will return to life."
+        "A find is attempting to eager-load an associated model that acts as paranoid. This may cause unexpected results."
+      end
+
+      def reference_info
+        return <<-EOF
+          A buggy eager load happens when an ActiveRecord finder performs eager loading of a
+          :has_many association and the "target" of the association acts as paranoid.
+
+          The acts_as_paranoid plugin does not correctly handle cases where eager loading
+          is performed using a JOIN strategy (a.k.a. "Cartesian join"). When paranoid models
+          are loaded in this way the result set will contain _all_ associated models, even
+          those that have been deleted! This is not usually what the caller intends.
+
+          A find with any of the following properties will cause Rails to use a Cartesian join:
+          * complex :conditions option (containing SQL fragments, or referring to tables using strings)
+          * complex :order
+          * complex :join
+          * complex :include
+          * use of named scopes (which almost always add complex options to the query)
+
+          If your find exhibits any of these properties and it performs eager loading of a model
+          that acts as paranoid, then you likely have a bug.
+        EOF
       end
     end
     

@@ -6,6 +6,7 @@ require 'digest/sha1'
 require 'ruby_parser'
 require 'sexp_processor'
 require 'builder'
+require 'redcloth'
 
 basedir = File.dirname(__FILE__)
 libdir = File.join(basedir, 'lib')
