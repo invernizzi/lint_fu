@@ -1,7 +1,8 @@
 module LintFu
   module Rails
-    class ApplicationModel < ModelElement
-      acts_as_supermodel
+    class ApplicationModel
+      include LintFu::ModelElement
+      include LintFu::SuperModel
       
       def initialize
       end

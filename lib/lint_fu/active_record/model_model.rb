@@ -1,6 +1,8 @@
 module LintFu
   module ActiveRecord
-    class ModelModel < ModelElement
+    class ModelModel
+      include LintFu::ModelElement
+      
       attr_reader :associations
       attr_writer :paranoid
       

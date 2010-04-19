@@ -14,7 +14,8 @@ module LintFu
 
       #sexp:: s(:call, <target>, <method_name>, s(:arglist))
       def observe_call(sexp)
-        if finder?(sexp) && (spotty = spotty_includes(sexp[3])) && !blessed?(sexp, UnsafeFind)
+        return unless finder?(sexp)
+        if finder?(sexp) && spotty_includes(sexp[3]) && !blessed?(sexp, UnsafeFind)
           scan.issues << BuggyEagerLoad.new(scan, self.file, sexp)
         end
       end
@@ -29,9 +30,6 @@ module LintFu
         arglist = ( sexp && (sexp[0] == :arglist) && sexp.to_ruby(:partial=>nil) )
         #no dice unless we're looking at an arglist
         return nil unless arglist
-
-        #if the finder's options hash is entirely constant, ba da bing
-        return nil if sexp.size <= 1 || sexp.last.constant?
 
         #no eager loading? no problem!
         return nil unless arglist.last.is_a?(Hash) && arglist.last.has_key?(:include)

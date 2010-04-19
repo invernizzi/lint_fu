@@ -14,6 +14,7 @@ module LintFu
         Dir.glob(File.join(models_dir, '**', '*.rb')).each do |f|
           contents = File.read(f)
           sexp = RubyParser.new.parse(contents)
+          sexp.file = f
           model_builder.process(sexp)
         end
 

@@ -1,5 +1,6 @@
 module LintFu
-  # An element of the application model that consists in part of submodels 
+  # An element of a static analysis model that contains, or consists of, submodels. For instance,
+  # an Application might consists of Models, Controllers and Views.
   module SuperModel
     def submodels
       return [].freeze unless @submodels
@@ -22,14 +23,11 @@ module LintFu
     end
   end
 
-  # An element of the application model being scanned; generally a class.
-  class ModelElement
-    attr_reader :supermodel, :modeled_class_name, :modeled_class_superclass_name, :parse_tree
-
-    # DSL command to mark a ModelElement as a container for other ModelElements
-    def self.acts_as_supermodel
-      include SuperModel
-    end
+  # An element of the static analysis model being created; generally corresponds to a
+  # class (e.g. model, controller or view) within the application being scanned.
+  module ModelElement
+    attr_accessor :supermodel
+    attr_reader   :modeled_class_name, :modeled_class_superclass_name, :parse_tree
 
     #sexp:: [:class, <classname>, <superclass|nil>, <CLASS DEFS>]
     #namespace:: Array of enclosing module names for this class 
@@ -42,8 +40,6 @@ module LintFu
       end
     end
 
-    attr_accessor :supermodel
-    
     #Have a pretty string representation
     def to_s
       "<<model of #{modeled_class_name}>>"

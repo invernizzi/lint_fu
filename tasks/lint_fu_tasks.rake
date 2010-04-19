@@ -65,7 +65,8 @@ def perform_scan(controller_checkers)
     controllers_dir = File.join(RAILS_ROOT, 'app', 'controllers')
     Dir.glob(File.join(controllers_dir, '**', '*.rb')).each do |filename|
       contents = File.read(filename)
-      sexp = RubyParser.new.parse(contents)
+      parser = RubyParser.new
+      sexp = parser.parse(contents, filename)
       visitor = LintFu::GenericVisitor.new
       controller_checkers.each { |klass| visitor.observers << klass.new(scan, context, filename) }
       visitor.process(sexp)
