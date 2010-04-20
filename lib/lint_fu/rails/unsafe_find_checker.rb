@@ -28,12 +28,15 @@ module LintFu
       end
     end
     
-    # Visit a Rails controller looking for troublesome stuff
+    # Visit a Rails controller looking for ActiveRecord finders being called in a way that
+    # might allow an attacker to perform unauthorized operations on resources, e.g. creating,
+    # updating or deleting someone else's records.
     class UnsafeFindChecker < Checker
       FINDER_REGEXP  = /^(find|first|all)(_or_initialize)?(_by_.*_id)?/
 
       #sexp:: s(:class, <class_name>, <superclass>, s(:scope, <class_definition>))
       def observe_class_begin(sexp)
+        #TODO get rid of RightScale-specific assumption
         @in_admin_controller = !!(sexp[1].to_ruby_string =~ /^Admin/)
       end
 
@@ -76,6 +79,7 @@ module LintFu
 
         #If calling a method -- check to see if we're accessing a current_* method
         if (sexp_type == :call) && (sexp[1] == nil)
+          #TODO get rid of RightScale-specific assumptions
           return true if (sexp[2] == :current_user)
           return true if (sexp[2] == :current_account)
         end

@@ -1,3 +1,4 @@
+
 module LintFu
   class Report
     attr_reader :scan, :scm
@@ -76,9 +77,7 @@ module LintFu
               @issues_by_class.each_pair do |klass, issues|
                 table.tr do |tr|
                   sample_issue = issues.first
-                  tr.td do |td|
-                    td.a(sample_issue.brief, :href=>"##{id_for_issue_class(sample_issue.class)}")
-                  end
+                  tr.td(sample_issue.brief)
                   tr.td(issues.size.to_s)
                   tr.td do |td|
                     issues.each do |issue|

@@ -4,7 +4,8 @@ require 'composite_sexp_processor'
 
 desc "Perform static analysis of the source code to find common security and correctness issues."
 task :lint do
-  scan, scm = perform_scan([LintFu::Rails::UnsafeFindChecker, LintFu::Rails::BuggyEagerLoadChecker])
+  CHECKERS = [LintFu::Rails::UnsafeFindChecker, LintFu::Rails::BuggyEagerLoadChecker, LintFu::Rails::SqlInjectionChecker]
+  scan, scm = perform_scan(CHECKERS)
 
   flavor = ENV['FORMAT'] || 'html'
   action = ENV['ACTION'] || 'open'

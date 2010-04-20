@@ -27,6 +27,7 @@ module LintFu
         callee, method, arglist = sexp[1], sexp[2], sexp[3]
         arglist = nil unless arglist[0] == :arglist
         discover_associations(callee, method, arglist)
+        discover_named_scopes(callee, method, arglist)
         discover_paranoia(callee, method, arglist)
         return sexp
       end
@@ -46,6 +47,14 @@ module LintFu
 
           @current_model_element.associations[assoc_name] = assoc_class_name
         end        
+      end
+
+      def discover_named_scopes(callee, method, arglist)
+        #Is the call declaring a named scope?
+        if (callee == nil && method == :named_scope) && arglist
+          scope_name = arglist[1].to_ruby
+          @current_model_element.named_scopes[scope_name] = arglist[2..-1].to_ruby
+        end
       end
 
       def discover_paranoia(callee, method, arglist)

@@ -114,4 +114,15 @@ class Sexp
         return false
     end
   end
+
+  def find_recursively(&test)
+    return self if test.call(self)
+
+    self.each do |child|
+      found = child.find_recursively(&test) if (Sexp === child)
+      return found if found
+    end
+
+    return nil
+  end
 end
