@@ -125,4 +125,16 @@ class Sexp
 
     return nil
   end
+
+  def find_all_recursively(results=nil, &test)
+    results ||= []
+    results << self if test.call(self)
+
+    self.each do |child|
+      child.find_all_recursively(results, &test) if (Sexp === child)
+    end
+
+    return nil if results.empty?
+    return results
+  end
 end
