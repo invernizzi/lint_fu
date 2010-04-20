@@ -74,6 +74,7 @@ module LintFu
                 tr.th '#'
                 tr.th 'Issues'
               end
+
               @issues_by_class.each_pair do |klass, issues|
                 table.tr do |tr|
                   sample_issue = issues.first

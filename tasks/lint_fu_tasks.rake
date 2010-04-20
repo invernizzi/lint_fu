@@ -23,7 +23,10 @@ task :lint do
 
   typename = "#{flavor}_report".camelize
   klass    = LintFu.const_get(typename.to_sym)
-  klass.new(scan, scm).generate(output)
+
+  timed("Generate report") do
+    klass.new(scan, scm).generate(output)
+  end
 
   case action
     when 'open'
@@ -37,14 +40,17 @@ private
 
 def timed(activity)
   print activity, '...'
+  STDOUT.flush
   t0 = Time.now.to_i
   yield
   t1 = Time.now.to_i
   dt = t1-t0
   if dt > 0
     puts "done (#{t1-t0} sec)"
+    STDOUT.flush
   else
     puts "done"
+    STDOUT.flush
   end
 end
 

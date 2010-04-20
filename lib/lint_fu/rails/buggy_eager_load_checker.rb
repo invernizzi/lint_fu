@@ -16,6 +16,7 @@ module LintFu
           those that have been deleted! This is not usually what the caller intends.
 
           A find with any of the following properties will cause Rails to use a Cartesian join:
+
           * complex :conditions option (containing SQL fragments, or referring to tables using strings)
           * complex :order
           * complex :join

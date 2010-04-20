@@ -53,7 +53,8 @@ module LintFu
         #Is the call declaring a named scope?
         if (callee == nil && method == :named_scope) && arglist
           scope_name = arglist[1].to_ruby
-          @current_model_element.named_scopes[scope_name] = arglist[2..-1].to_ruby
+          scope_args = arglist[2..-1].to_ruby(:partial=>nil)
+          @current_model_element.named_scopes[scope_name] = scope_args
         end
       end
 

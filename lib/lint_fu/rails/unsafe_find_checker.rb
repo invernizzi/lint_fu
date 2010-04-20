@@ -2,13 +2,14 @@ module LintFu
   module Rails
     class UnsafeFind < Issue
       def detail
-        if @sexp[1] & @sexp[2]
-          info = "#{@sexp[1].to_ruby_string}.#{@sexp[2].to_ruby_string}"
-        else
-          info = "an ActiveRecord finder"
-        end
-
-        "A controller is directly calling #{info}; the results may not be properly scoped or authorized."
+        info = "#{@sexp[1].to_ruby_string}.#{@sexp[2].to_ruby_string}" rescue "an ActiveRecord finder"
+        params = (", " + @sexp[3].to_ruby) rescue ""
+        
+        return <<-EOF
+          "A controller is directly calling #{info}; the results may not be properly scoped or authorized.
+          Examine the method parameters#{params} to see if any of them could be influenced by a bad guy
+          with no intervention, validation or filtering."
+        EOF
       end
       
       def reference_info
@@ -18,8 +19,10 @@ module LintFu
           and/or manipulate the resulting models.
 
           It is not trivial to determine whether a find is safe, because authorization can happen
-          in many ways and the "right" way to do it depends on the application requirements. Here
-          are some things to consider when evaluating whether a find is safe:
+          in many ways and the "right" way to do it depends on the application requirements.
+
+          Here are some things to consider when evaluating whether a find is safe:
+
           * Do the find's conditions scope it in some way to current_user or current_account?
           * How will the results be used? What information is displayed in the view?
           * Are the results scoped afterward, e.g. by calling #select on the result set?
