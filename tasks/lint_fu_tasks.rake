@@ -30,6 +30,7 @@ task :lint do
 
   case action
     when 'open'
+      system("sync") #Mac/Linux - make sure all HTML is written to disk; harmless on Windows
       system("open #{output_name}") if (output != STDOUT && STDOUT.tty?)
     when 'status'
       exit( [scan.issues.size, 255].min )

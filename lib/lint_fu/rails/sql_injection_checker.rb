@@ -6,26 +6,36 @@ module LintFu
       end
 
       def detail
-        return <<-EOF
-          A \#{dynamic string} is being used to interpolate Ruby code into a string expression.
-          This may allow unfiltered user input to appear in ActiveRecord options like :conditions,
-          :order, :join or :include, leading to SQL injection.
-        EOF
+        return <<EOF
+A \#{dynamic string} is being used to interpolate Ruby code into a string expression. This may allow unfiltered user input to appear in ActiveRecord options, leading to SQL injection.
+EOF
       end
 
       def reference_info
-        return <<-EOF
-          A SQL injection vulnerability happens when input from the network is passed to ActiveRecord
-          in a way that causes it to be interpreted as SQL. If a user can inject SQL into your app,
-          he owns the database, game over.
+        return <<EOF
+h4. What is it?
 
-          Preventing SQL injection involves using common sense. Don't do stuff that looks like this!
+A SQL injection vulnerability happens when input from an untrusted source is passed to ActiveRecord in a way that causes it to be interpreted as SQL. If users can inject SQL, they own your database, game over.
 
-          <pre><code>
-          Account.find(:conditions=>"name like '\#{params[:name]}'")
-          Account.find(:conditions=>params[:query])
-          </pre></code>
-        EOF
+"Untrusted source" is usually the network but it could be a file on disk, or even a column in the database.
+
+h4. When does it happen?
+
+The most common source of SQL injection is request parameters that are used without properly escaping them.
+
+bc. Account.first(:conditions=>"name like '\#{params[:name]}'")
+User.all(:order=>params[:order_by])
+
+h4. How do I fix it?
+
+Instead of using query parameters directly, make a habit of _always_ using query parameter replacement:
+
+bc. Account.first(:conditions=>[ 'name like ?', params[:name] ])
+
+If you cannot use parameter replacement, escape the string manually using @ActiveRecord::Base#sanitize@.
+
+bc. User.all(:order=>ActiveRecord::Base.sanitize(params[:order_by]))
+EOF
       end
     end
 

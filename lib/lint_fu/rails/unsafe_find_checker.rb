@@ -5,29 +5,49 @@ module LintFu
         info = "#{@sexp[1].to_ruby_string}.#{@sexp[2].to_ruby_string}" rescue "an ActiveRecord finder"
         params = (", " + @sexp[3].to_ruby) rescue ""
         
-        return <<-EOF
-          "A controller is directly calling #{info}; the results may not be properly scoped or authorized.
-          Examine the method parameters#{params} to see if any of them could be influenced by a bad guy
-          with no intervention, validation or filtering."
-        EOF
+        return <<EOF
+A controller is directly calling #{info}; the results may not be properly scoped or authorized. Examine the method parameters#{params} to see if any of them could be influenced by a bad guy.
+EOF
       end
       
       def reference_info
-        return <<-EOF
-          An unsafe find happens when a controller makes an ActiveRecord query without performing
-          an authorization check to determine whether the logged-in user is authorized to view
-          and/or manipulate the resulting models.
+        return <<EOF
+h4. What is it?
 
-          It is not trivial to determine whether a find is safe, because authorization can happen
-          in many ways and the "right" way to do it depends on the application requirements.
+An unsafe find is an ActiveRecord query that is performed without checking whether the logged-in user is authorized to view or manipulate the resulting models.
 
-          Here are some things to consider when evaluating whether a find is safe:
+h4. When does it happen?
 
-          * Do the find's conditions scope it in some way to current_user or current_account?
-          * How will the results be used? What information is displayed in the view?
-          * Are the results scoped afterward, e.g. by calling #select on the result set?
-          * Is authorization checked afterward, e.g. by checking ownership and raising ActiveRecord::NotFound?
-        EOF
+Some trivial examples:
+
+bc. BankAccount.first(params[:id]).destroy
+Account.all(:conditions=>{:nickname=>params[:nickname]})
+
+In reality, it often hard to determine whether a find is safe. Authorization can happen in many ways and the "right" way to do it depends on the application requirements.
+
+Here are some things to consider when evaluating whether a find is safe:
+
+* Is authorization checked beforehand or afterward, e.g. by checking ownership of the model?
+* Do the query's conditions scope it in some way to the current user or account?
+* How will the results be used? What information is displayed in the view?
+* Are the results scoped afterward, e.g. by calling @select@ on the result set?
+
+h4. How do I fix it?
+
+Use named scopes to scope your queries instead of calling the class-level finders:
+
+bc. current_user.bank_accounts.first(params[:id])
+
+If a named scope is not convenient, include conditions that scope the query:
+
+bc. BankAccount.find(:conditions=>{:owner_id=>current_user})
+
+If your authorization rules are so complex that neither of those approaches work, always make sure to peform authorization youself:
+
+bc. #My bank allows customers to access ANY account on their birthday
+@bank_account = BankAccount.first(params[:id])
+raise ActiveRecord::RecordNotFound unless current_user.born_on = Date.today
+EOF
       end
     end
     

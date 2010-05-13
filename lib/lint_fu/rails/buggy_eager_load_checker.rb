@@ -6,26 +6,30 @@ module LintFu
       end
 
       def reference_info
-        return <<-EOF
-          A buggy eager load happens when an ActiveRecord finder performs eager loading of a
-          :has_many association and the "target" of the association acts as paranoid.
+        return <<EOF
+h4. What is it?
 
-          The acts_as_paranoid plugin does not correctly handle cases where eager loading
-          is performed using a JOIN strategy (a.k.a. "Cartesian join"). When paranoid models
-          are loaded in this way the result set will contain _all_ associated models, even
-          those that have been deleted! This is not usually what the caller intends.
+A buggy eager load happens when an ActiveRecord finder performs eager loading of a @:has_many@ association and the "target" of the association acts as paranoid.
 
-          A find with any of the following properties will cause Rails to use a Cartesian join:
+The acts_as_paranoid plugin does not correctly eager loads that use a @JOIN@ strategy. If a paranoid model is eager loaded in this way, _all_ models -- even deleted ones -- will be loaded.
 
-          * complex :conditions option (containing SQL fragments, or referring to tables using strings)
-          * complex :order
-          * complex :join
-          * complex :include
-          * use of named scopes (which almost always add complex options to the query)
+h4. When does it happen?
 
-          If your find exhibits any of these properties and it performs eager loading of a model
-          that acts as paranoid, then you likely have a bug.
-        EOF
+A finder with any of the following properties will cause Rails to eager-load using @JOIN@
+
+* complex @:conditions@ option (containing SQL fragments, or referring to tables using strings)
+* complex @:order@
+* complex @:join@
+* complex @:include@
+* use of named scopes (which almost always add complex options to the query)
+
+If your find exhibits any of these properties and it @:include@s a paranoid model, then you have a problem.
+
+h4. How do I fix it?
+
+Avoid doing complex finds at the same time you @:include@ a paranoid model.
+
+EOF
       end
     end
     

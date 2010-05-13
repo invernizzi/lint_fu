@@ -60,6 +60,8 @@ module LintFu
       x.html do |html|
         html.head do |head|
           head.title 'Static Analysis Results'
+          include_external_javascripts(head)
+          include_external_stylesheets(head)
           head.style(STYLESHEET, :type=>'text/css')
         end
         html.body do |body|
@@ -150,7 +152,8 @@ module LintFu
             issues.each do |issue|
               body.div(:class=>'issue', :id=>"issue_#{issue.hash}") do |div|
                 div.h4 do |h4|
-                  h4.a(issue.brief, :href=>"##{id_for_issue_class(issue.class)}")
+                  href = "#TB_inline?width=800&height=600&inlineId=#{id_for_issue_class(issue.class)}"
+                  h4.a(issue.brief, :href=>href.to_sym, :title=>issue.brief, :class=>'thickbox')
                   h4.text! ", #{File.basename(issue.file)}:#{issue.line}"
                 end
                 div.span(issue.detail, :class=>'detail')
@@ -159,18 +162,7 @@ module LintFu
                 first   = 1 if first < 1
                 last    = issue.line + 3
                 excerpt = scm.excerpt(issue.file, (first..last), :blame=>false)
-
-                div.pre do |pre|
-                  counter = first
-                  excerpt.each do |line|
-                    if counter == issue.line
-                      pre.span(line, :class=>'issue')
-                    else
-                      pre.text! line
-                    end
-                    counter += 1
-                  end
-                end
+                highlighted_code_snippet(div, excerpt, first, issue.line)
               end
             end
           end
@@ -183,14 +175,38 @@ module LintFu
               div << RedCloth.new(sample_issue.reference_info).to_html 
             end
           end
+
+          activate_syntax_highlighter(body)
         end
       end
     end
 
     private
 
+    def highlighted_code_snippet(parent, snippet, first_line, highlight)
+      parent.pre(snippet, :class=>"brush: ruby; first-line: #{first_line}; highlight: [#{highlight}]")
+    end
+
+    def include_external_javascripts(head)
+      head.script(:src=>'http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js', :type=>'text/javascript')
+      head.script(:src=>'http://gdata-samples.googlecode.com/svn/!svn/bc/178/trunk/oauth_playground/js/thickbox-compressed.js', :type=>'text/javascript')
+      head.script(:src=>'http://xregexp.com/xregexp-min.js', :type=>'text/javascript')
+      head.script(:src=>'http://bitbucket.org/alexg/syntaxhighlighter/raw/378fedcc2759/scripts/shCore.js', :type=>'text/javascript')
+      head.script(:src=>'http://bitbucket.org/alexg/syntaxhighlighter/raw/378fedcc2759/scripts/shBrushRuby.js', :type=>'text/javascript')
+    end
+
+    def include_external_stylesheets(head)
+      head.link(:rel=>'stylesheet', :type=>'text/css', :href=>'http://gdata-samples.googlecode.com/svn/!svn/bc/178/trunk/oauth_playground/css/thickbox.css')
+      head.link(:rel=>'stylesheet', :type=>'text/css', :href=>'http://bitbucket.org/alexg/syntaxhighlighter/raw/378fedcc2759/styles/shCore.css')
+      head.link(:rel=>'stylesheet', :type=>'text/css', :href=>'http://bitbucket.org/alexg/syntaxhighlighter/raw/378fedcc2759/styles/shThemeDefault.css')
+    end
+
     def id_for_issue_class(klass)
       "reference_#{klass.name.split('::')[-1].underscore}"      
+    end
+
+    def activate_syntax_highlighter(body)
+      body.script('SyntaxHighlighter.all()', :type=>'text/javascript')
     end
   end
 
