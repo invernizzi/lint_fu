@@ -5,7 +5,7 @@ module LintFu
     def initialize(scan, file, sexp)
       @scan = scan
       @file = file
-      @sexp = sexp.clone
+      @sexp = sexp.deep_clone
     end
 
     def line

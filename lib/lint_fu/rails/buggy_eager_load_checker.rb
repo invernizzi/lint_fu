@@ -1,8 +1,13 @@
 module LintFu
   module Rails
     class BuggyEagerLoad < Issue
+      def initialize(scan, file, sexp, subject)
+        super(scan, file, sexp)
+        @subject = subject
+      end
+
       def detail
-        "A find is attempting to eager-load an associated model that acts as paranoid. This may cause unexpected results."
+        "Instances of the paranoid model @#{@subject}@ are being eager-loaded. This may cause unexpected results."
       end
 
       def reference_info
@@ -40,8 +45,8 @@ EOF
       #sexp:: s(:call, <target>, <method_name>, s(:arglist))
       def observe_call(sexp)
         return unless finder?(sexp)
-        if finder?(sexp) && spotty_includes(sexp[3]) && !blessed?(sexp, UnsafeFind)
-          scan.issues << BuggyEagerLoad.new(scan, self.file, sexp)
+        if finder?(sexp) && (si = spotty_includes(sexp[3])) && !blessed?(sexp, UnsafeFind)
+          scan.issues << BuggyEagerLoad.new(scan, self.file, sexp, si.modeled_class_name)
         end
       end
 
@@ -64,7 +69,9 @@ EOF
           singular   = plural.singularize
           class_name = singular.camelize
           type = self.analysis_model.models.detect { |m| m.modeled_class_name == class_name }
-          # TODO replace this clever hack, which infers :has_many associations using plural/singular word comparison
+          # If we're eager loading a 1:1 association, don't bother to scream; it's likely
+          # that use the user would want to load the deleted thing anyway.
+          # TODO replace this clever hack, which infers a :has_many association using plurality
           if !type || ( type.paranoid? && (plural != singular) )
             return type
           end

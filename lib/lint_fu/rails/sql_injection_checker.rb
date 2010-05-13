@@ -1,14 +1,17 @@
 module LintFu
   module Rails
     class SqlInjection < Issue
+      def initialize(scan, file, sexp, subject)
+        super(scan, file, sexp)
+        @subject = subject
+      end
+
       def brief
         "SQL Injection"
       end
 
       def detail
-        return <<EOF
-A \#{dynamic string} is being used to interpolate Ruby code into a string expression. This may allow unfiltered user input to appear in ActiveRecord options, leading to SQL injection.
-EOF
+        return "Could a bad guy insert SQL fragments into @#{@subject}@?"
       end
 
       def reference_info
@@ -72,9 +75,10 @@ EOF
 
         call    = sexp[2].to_s
         arglist = sexp[3]
-        
-        if finder?(call) && has_tainted_params?(arglist)
-          scan.issues << SqlInjection.new(scan, self.file, sexp)
+
+        tp = tainted_params(arglist)
+        if finder?(call) && !tp.empty?
+          scan.issues << SqlInjection.new(scan, self.file, sexp, tp[0].to_ruby_string)
         end
       end
 
@@ -91,7 +95,7 @@ EOF
           analysis_model.models.detect { |m| m.associations.has_key?(call) })
       end
 
-      def has_tainted_params?(arglist)
+      def tainted_params(arglist)
         tainted_params = []
 
         #Find potentially-tainted members of the arglist's options hash(es)
@@ -115,7 +119,7 @@ EOF
           (Sexp === value) && value.find_recursively { |se| se[0] == :dstr }
         end
 
-        return !tainted_params.empty?
+        return tainted_params
       end      
     end
   end

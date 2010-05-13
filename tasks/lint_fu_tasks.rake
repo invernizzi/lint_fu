@@ -26,6 +26,7 @@ task :lint do
 
   timed("Generate report") do
     klass.new(scan, scm).generate(output)
+    output.close
   end
 
   case action

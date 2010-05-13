@@ -5,6 +5,7 @@ require 'digest/sha1'
 #Required gems
 require 'ruby_parser'
 require 'sexp_processor'
+require 'ruby2ruby'
 require 'builder'
 require 'redcloth'
 

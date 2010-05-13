@@ -22,7 +22,7 @@ module LintFu
       h2    { font-family: Arial,Helvetica,sans-serif; color: white; background: black }
       h3    { font-family: Arial,Helvetica,sans-serif }
       h4    { border-bottom: 1px dotted grey }
-      pre span.issue { background: yellow }
+      .detail code { background: yellow }
     EOF
 
     def generate(output_stream)
@@ -152,11 +152,12 @@ module LintFu
             issues.each do |issue|
               body.div(:class=>'issue', :id=>"issue_#{issue.hash}") do |div|
                 div.h4 do |h4|
-                  href = "#TB_inline?width=800&height=600&inlineId=#{id_for_issue_class(issue.class)}"
-                  h4.a(issue.brief, :href=>href.to_sym, :title=>issue.brief, :class=>'thickbox')
+                  reference_link(div, issue)
                   h4.text! ", #{File.basename(issue.file)}:#{issue.line}"
                 end
-                div.span(issue.detail, :class=>'detail')
+                div.span(:class=>'detail') do |span|
+                  span << RedCloth.new(issue.detail).to_html
+                end
 
                 first   = issue.line-3
                 first   = 1 if first < 1
@@ -182,6 +183,11 @@ module LintFu
     end
 
     private
+
+    def reference_link(parent, issue)
+      href = "#TB_inline?width=800&height=600&inlineId=#{id_for_issue_class(issue.class)}"
+      parent.a(issue.brief, :href=>href.to_sym, :title=>issue.brief, :class=>'thickbox')      
+    end
 
     def highlighted_code_snippet(parent, snippet, first_line, highlight)
       parent.pre(snippet, :class=>"brush: ruby; first-line: #{first_line}; highlight: [#{highlight}]")

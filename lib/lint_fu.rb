@@ -16,42 +16,13 @@ class Symbol
 end
 
 class Sexp
+  def deep_clone
+    Marshal.load(Marshal.dump(self))
+  end
+
   #Generate a human-readable description for this sexp that is similar to source code.
   def to_ruby_string
-    typ = self[0]
-
-    case typ
-      when :true
-        return 'true'
-      when :false
-        return 'false'
-      when :lit, :str
-        return self[1].to_s
-      when :array
-        return self[1..-1].collect { |x| x.to_ruby }.inspect
-      when :hash
-        result = {}
-        key, value = nil, nil
-        flipflop = false
-        self[1..-1].each do |token|
-          if flipflop
-            value = token
-            result[key.to_ruby] = value.to_ruby
-          else
-            key = token
-          end
-          flipflop = !flipflop
-        end
-        return result.inspect
-      when :const
-        return self[1].to_s
-      when :colon2
-        return self[1].to_ruby_string + '::' + self[2].to_ruby_string  
-      when :colon3
-        return '::' + self[1].to_ruby_string
-      else
-        raise StandardError.new("Sexp cannot be converted to Ruby string " + self.to_s)
-    end
+    Ruby2Ruby.new.process(self.deep_clone)
   end
 
   # Translate a sexp containing a Ruby data literal (string, int, array, hash, etc) into the equivalent Ruby object.

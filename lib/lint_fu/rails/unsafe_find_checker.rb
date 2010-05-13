@@ -2,12 +2,7 @@ module LintFu
   module Rails
     class UnsafeFind < Issue
       def detail
-        info = "#{@sexp[1].to_ruby_string}.#{@sexp[2].to_ruby_string}" rescue "an ActiveRecord finder"
-        params = (", " + @sexp[3].to_ruby) rescue ""
-        
-        return <<EOF
-A controller is directly calling #{info}; the results may not be properly scoped or authorized. Examine the method parameters#{params} to see if any of them could be influenced by a bad guy.
-EOF
+        return "Could a bad guy make this finder return things he shouldn't be able to get?"
       end
       
       def reference_info
@@ -82,9 +77,9 @@ EOF
         if (sexp[1] != nil) && (sexp[1][0] == :const || sexp[1][0] == :colon2)
           name = sexp[1].to_ruby_string
           type = self.analysis_model.models.detect { |m| m.modeled_class_name == name }
-          call = sexp[2].to_s
-
-          if finder?(type, call) && !sexp[3].constant? && !sexp_contains_scope?(sexp[3]) && !blessed?(sexp, UnsafeFind)
+          call   = sexp[2].to_s
+          params = sexp[3]
+          if finder?(type, call) && !params.constant? && !sexp_contains_scope?(params) && !blessed?(sexp, UnsafeFind)
             scan.issues << UnsafeFind.new(scan, self.file, sexp)
           end
         end        
