@@ -10,9 +10,13 @@ if defined?(LintFu)
     flavor = ENV['FORMAT'] || 'html'
     action = ENV['ACTION'] || 'open'
 
+    #Enable seamless CruiseControl.rb integration: write our report to the CC build artifacts folder
+    output_dir = ENV['CC_BUILD_ARTIFACTS'] || RAILS_ROOT
+    mkdir_p output_dir unless File.directory?(output_dir)
+
     case flavor
       when 'html'
-        output_name = File.join(RAILS_ROOT, 'lint.html')
+        output_name = File.join(output_dir, 'lint.html')
         output      = File.open(output_name, 'w')
       when 'text'
         output = STDOUT
