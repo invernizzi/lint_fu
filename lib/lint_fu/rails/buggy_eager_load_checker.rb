@@ -45,7 +45,7 @@ EOF
       #sexp:: s(:call, <target>, <method_name>, s(:arglist))
       def observe_call(sexp)
         return unless finder?(sexp)
-        if finder?(sexp) && (si = spotty_includes(sexp[3])) && !blessed?(sexp, UnsafeFind)
+        if finder?(sexp) && (si = spotty_includes(sexp[3])) && !blessed?(sexp, BuggyEagerLoad)
           scan.issues << BuggyEagerLoad.new(scan, self.file, sexp, si.modeled_class_name)
         end
       end
@@ -57,12 +57,23 @@ EOF
       end
 
       def spotty_includes(sexp)
+        #transform the sexp (if it's an arglist) into a hash for easier scrutiny
         arglist = ( sexp && (sexp[0] == :arglist) && sexp.to_ruby(:partial=>nil) )
         #no dice unless we're looking at an arglist
         return nil unless arglist
 
-        #no eager loading? no problem!
-        return nil unless arglist.last.is_a?(Hash) && arglist.last.has_key?(:include)
+        #no options hash in arglist? no problem!
+        return nil unless (options = arglist.last).is_a?(Hash)
+
+        does_eager_loading = options.has_key?(:include)
+        has_complexity_prone_params =
+                options.has_key?(:conditions) ||
+                options.has_key?(:order) ||
+                options.has_key?(:joins) || 
+                options.has_key?(:group)
+
+        #no eager loading, or no complexity-prone params? no problem!
+        return nil unless does_eager_loading && has_complexity_prone_params
         
         gather_includes(arglist.last[:include]).each do |inc|
           plural     = inc.to_s

@@ -115,8 +115,14 @@ EOF
         end
 
         #Find only those params whose values actually seem to be tainted
+        #A param is tainted if it contains a dstr, unless it's an Array
+        #in which case it's only tainted if its 0th member is a dstr.
         tainted_params = tainted_params.select do |value|
-          (Sexp === value) && value.find_recursively { |se| se[0] == :dstr }
+          next false unless (Sexp === value)
+          is_array        = (value[0] == :array )
+          first_elem_dstr = (is_array && value[1] && value[1][0] == :dstr)
+          has_dstr        = value.find_recursively { |se| se[0] == :dstr }
+          next (!is_array || first_elem_dstr) && has_dstr
         end
 
         return tainted_params
