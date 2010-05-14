@@ -1,8 +1,8 @@
 module LintFu
   class Checker
     COMMENT                  = /^\s*#/
-    VERBOSE_BLESSING_COMMENT = /#\s*security\s*[-:]\s*not\s*a?n?\s*([a-z0-9 ]*) ?(because|;)\s*(.*)/i
-    BLESSING_COMMENT         = /#\s*security\s*[-:]\s*not\s*a?n?\s*([a-z0-9 ]*)/i
+    VERBOSE_BLESSING_COMMENT = /#\s*(lint|security)\s*[-:]\s*not\s*a?n?\s*([a-z0-9 ]*) ?(because|;)\s*(.*)/i
+    BLESSING_COMMENT         = /#\s*(lint|security)\s*[-:]\s*not\s*a?n?\s*([a-z0-9 ]*)/i
 
     attr_reader :scan, :analysis_model, :file
 
@@ -24,7 +24,7 @@ module LintFu
       end
 
       return false unless match
-      blessed_issue_class = match[1].downcase.split(/\s+/).join('_').camelize
+      blessed_issue_class = match[2].downcase.split(/\s+/).join('_').camelize
 
       # Determine whether the blessed issue class appears anywhere in the class hierarchy of
       # issue_class.

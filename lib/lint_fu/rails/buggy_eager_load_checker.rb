@@ -7,7 +7,7 @@ module LintFu
       end
 
       def detail
-        "Instances of the paranoid model @#{@subject}@ are being eager-loaded. This may cause unexpected results."
+        "Instances of the paranoid model <code>#{@subject}</code> are being eager-loaded. This may cause unexpected results."
       end
 
       def reference_info

@@ -11,7 +11,7 @@ module LintFu
       end
 
       def detail
-        return "Could a bad guy insert SQL fragments into @#{@subject}@?"
+        return "Could a bad guy insert SQL fragments into <code>#{@subject}</code>?"
       end
 
       def reference_info
