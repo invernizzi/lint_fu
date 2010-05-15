@@ -7,14 +7,17 @@ if defined?(LintFu)
     CHECKERS = [LintFu::Rails::UnsafeFindChecker, LintFu::Rails::BuggyEagerLoadChecker, LintFu::Rails::SqlInjectionChecker]
     scan, scm = perform_scan(CHECKERS)
 
-    flavor = ENV['FORMAT'] || 'html'
-    action = ENV['ACTION'] || 'open'
+    if scan.issues.empty?
+      puts "Clean scan: no issues found. Skipping report."
+      exit(0)
+    end
 
     #Enable seamless CruiseControl.rb integration: write our report to the CC build artifacts folder
     output_dir = ENV['CC_BUILD_ARTIFACTS'] || RAILS_ROOT
     mkdir_p output_dir unless File.directory?(output_dir)
 
-    case flavor
+    #Use a filename (or STDOUT) for our report that corresponds to its format
+    case (flavor = ENV['FORMAT'] || 'html')
       when 'html'
         output_name = File.join(output_dir, 'lint.html')
         output      = File.open(output_name, 'w')
@@ -33,13 +36,8 @@ if defined?(LintFu)
       output.close
     end
 
-    case action
-      when 'open'
-        system("sync") #Mac/Linux - make sure all HTML is written to disk; harmless on Windows
-        system("open #{output_name}") if (output != STDOUT && STDOUT.tty?)
-      when 'status'
-        exit( [scan.issues.size, 255].min )
-    end
+    system("open #{output_name}") if (output != STDOUT && STDOUT.tty?)
+    exit( [scan.issues.size, 255].min )
   end
 
   private
