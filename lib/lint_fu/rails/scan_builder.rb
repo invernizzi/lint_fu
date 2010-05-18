@@ -26,6 +26,16 @@ module LintFu
           visitor.process(sexp)
         end
 
+        #Scan models
+        Dir.glob(File.join(models_dir, '**', '*.rb')).each do |filename|
+          contents = File.read(filename)
+          parser = RubyParser.new
+          sexp = parser.parse(contents, filename)
+          visitor = LintFu::Visitor.new
+          visitor.observers << SqlInjectionChecker.new(scan, context, filename, 0.2)
+          visitor.process(sexp)          
+        end
+
         return scan
       end
     end

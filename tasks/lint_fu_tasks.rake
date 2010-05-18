@@ -50,7 +50,7 @@ if defined?(LintFu)
     end
 
     system("open #{output_name}") if (output != STDOUT && STDOUT.tty?)
-    exit( [genuine_issues.size, 255].min )
+    exit( [@genuine_issues.size, 255].min )
   end
 
   private

@@ -1,10 +1,10 @@
 module LintFu
   class Checker
-    attr_reader :scan, :analysis_model, :file
+    attr_reader :scan, :context, :file
 
-    def initialize(scan, analysis_model, file=nil)
+    def initialize(scan, context, file=nil)
       @scan           = scan
-      @analysis_model = analysis_model
+      @context = context
       @file           = file
     end
   end

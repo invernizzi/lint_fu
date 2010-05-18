@@ -76,7 +76,7 @@ EOF
         #sexp:: :call, <target>, <method_name>, <argslist...>
         if (sexp[1] != nil) && (sexp[1][0] == :const || sexp[1][0] == :colon2)
           name = sexp[1].to_ruby_string
-          type = self.analysis_model.models.detect { |m| m.modeled_class_name == name }
+          type = self.context.models.detect { |m| m.modeled_class_name == name }
           call   = sexp[2].to_s
           params = sexp[3]
           if finder?(type, call) && !params.constant? && !sexp_contains_scope?(params)

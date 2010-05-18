@@ -1,8 +1,8 @@
 module LintFu
   module Rails
     class SqlInjection < Issue
-      def initialize(scan, file, sexp, subject)
-        super(scan, file, sexp)
+      def initialize(scan, file, sexp, subject, confidence=1.0)
+        super(scan, file, sexp, confidence)
         @subject = subject
       end
 
@@ -48,9 +48,10 @@ EOF
       FINDER_REGEXP = /^(find|first|all)(_or_initialize)?(_by_.*_id)?/
       SINK_OPTIONS  = Set.new([:conditions, :select, :order, :group, :from, :include, :join])
       
-      def initialize(scan, context, filename)
+      def initialize(scan, context, filename, base_confidence=1.0)
         super(scan, context, filename)
         @class_definition_scope = []
+        @base_confidence = base_confidence
       end
 
       def observe_class_begin(sexp)
@@ -78,7 +79,7 @@ EOF
 
         tp = tainted_params(arglist)
         if finder?(call) && !tp.empty?
-          scan.issues << SqlInjection.new(scan, self.file, sexp, tp[0].to_ruby_string)
+          scan.issues << SqlInjection.new(scan, self.file, sexp, tp[0].to_ruby_string, @base_confidence)
         end
       end
 
@@ -91,8 +92,8 @@ EOF
         # it's better than trying to puzzle out which class/association is being
         # called (until we have type inference and other cool stuff).
         ( call =~ FINDER_REGEXP ||
-          analysis_model.models.detect { |m| m.named_scopes.has_key?(call) } ||
-          analysis_model.models.detect { |m| m.associations.has_key?(call) })
+          self.context.models.detect { |m| m.named_scopes.has_key?(call) } ||
+          self.context.models.detect { |m| m.associations.has_key?(call) })
       end
 
       def tainted_params(arglist)

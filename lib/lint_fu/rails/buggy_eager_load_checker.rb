@@ -79,7 +79,7 @@ EOF
           plural     = inc.to_s
           singular   = plural.singularize
           class_name = singular.camelize
-          type = self.analysis_model.models.detect { |m| m.modeled_class_name == class_name }
+          type = self.context.models.detect { |m| m.modeled_class_name == class_name }
           # If we're eager loading a 1:1 association, don't bother to scream; it's likely
           # that use the user would want to load the deleted thing anyway.
           # TODO replace this clever hack, which infers a :has_many association using plurality
