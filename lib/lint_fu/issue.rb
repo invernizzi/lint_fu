@@ -1,11 +1,12 @@
 module LintFu
   class Issue
-    attr_reader :file, :sexp
+    attr_reader :file, :sexp, :confidence
     
-    def initialize(scan, file, sexp)
+    def initialize(scan, file, sexp, confidence=1.0)
       @scan = scan
       @file = file
       @sexp = sexp.deep_clone
+      self.confidence = confidence
     end
 
     def line
@@ -33,7 +34,12 @@ module LintFu
     end
 
     def hash()
-      Digest::SHA1.hexdigest("#{self.class.name} - #{self.relative_file} - #{sexp.line} - #{sexp.to_s}")
+      Digest::SHA1.hexdigest("#{self.class.name} - #{self.relative_file} - #{sexp.fingerprint}")
+    end
+
+    def confidence=(confidence)
+      raise ArgumentError, "Confidence must be a real number in the range (0..1)" unless (0..1).include?(confidence)
+      @confidence = confidence
     end
   end
 end

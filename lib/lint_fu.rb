@@ -20,6 +20,15 @@ class Sexp
     Marshal.load(Marshal.dump(self))
   end
 
+  #Return a version of this Sexp that preserves the structure of the original, but with
+  #any specific names, quantities or other values replaced with nil. The fingerprint of
+  #a given chunk of code will tend to remain the same over time, even if variable names
+  #or other inconsequential details are changed.
+  #TODO actually implement this method
+  def fingerprint
+    self
+  end
+
   #Generate a human-readable description for this sexp that is similar to source code.
   def to_ruby_string
     Ruby2Ruby.new.process(self.deep_clone)

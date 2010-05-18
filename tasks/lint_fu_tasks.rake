@@ -8,17 +8,19 @@ if defined?(LintFu)
 
     #Build a model of the application we are scanning.
     timed("Build a model of the application") do
-      builder = LintFu::Rails::ApplicationModelBuilder.new(RAILS_ROOT)
+      builder = LintFu::Rails::ModelApplicationBuilder.new(RAILS_ROOT)
       @application = builder.model_elements[0]
       raise LintFu::ProviderError.new("Unable to identify the source control provider for #{RAILS_ROOT}") unless @scm
     end
 
     #Using the model we built, scan the controllers for security bugs.
     timed("Scan the application") do
-      @scan = @application.perform_scan
+      builder = LintFu::Rails::ScanBuilder.new(RAILS_ROOT)
+      @scan = builder.scan(@application)
     end
 
-    if @scan.genuine_issues.empty?
+    @genuine_issues = @scan.issues.select { |i| !@scan.blessed?(i) }
+    if @genuine_issues.empty?
       puts "Clean scan: no issues found. Skipping report."
       exit(0)
     end
@@ -43,12 +45,12 @@ if defined?(LintFu)
     klass    = LintFu.const_get(typename.to_sym)
 
     timed("Generate report") do
-      klass.new(@scan, @scm).generate(output)
+      klass.new(@scan, @scm, @genuine_issues).generate(output)
       output.close
     end
 
     system("open #{output_name}") if (output != STDOUT && STDOUT.tty?)
-    exit( [@scan.genuine_issues.size, 255].min )
+    exit( [genuine_issues.size, 255].min )
   end
 
   private

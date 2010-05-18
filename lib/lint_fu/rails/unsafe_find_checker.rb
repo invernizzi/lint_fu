@@ -80,7 +80,7 @@ EOF
           call   = sexp[2].to_s
           params = sexp[3]
           if finder?(type, call) && !params.constant? && !sexp_contains_scope?(params)
-            scan.add_issue UnsafeFind.new(scan, self.file, sexp)
+            scan.issues << UnsafeFind.new(scan, self.file, sexp)
           end
         end        
       end

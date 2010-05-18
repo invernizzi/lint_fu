@@ -78,7 +78,7 @@ EOF
 
         tp = tainted_params(arglist)
         if finder?(call) && !tp.empty?
-          scan.add_issue SqlInjection.new(scan, self.file, sexp, tp[0].to_ruby_string)
+          scan.issues << SqlInjection.new(scan, self.file, sexp, tp[0].to_ruby_string)
         end
       end
 

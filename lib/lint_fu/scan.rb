@@ -6,20 +6,12 @@ module LintFu
     VERBOSE_BLESSING_COMMENT = /#\s*(lint|security)\s*[-:]\s*not\s*a?n?\s*([a-z0-9 ]*) ?(because|;)\s*(.*)/i
     BLESSING_COMMENT         = /#\s*(lint|security)\s*[-:]\s*not\s*a?n?\s*([a-z0-9 ]*)/i
 
-    attr_reader :fs_root, :genuine_issues
+    attr_reader :fs_root, :issues
 
     def initialize(fs_root)
       @fs_root = fs_root
       @issues = Set.new
-      @genuine_issues = Set.new
     end
-
-    def add_issue(issue)
-      @issues << issue
-      @genuine_issues << issue unless blessed?(issue)
-    end
-
-    protected
 
     def blessed?(issue)
       comments = preceeding_comments(issue.sexp)

@@ -46,7 +46,7 @@ EOF
       def observe_call(sexp)
         return unless finder?(sexp)
         if finder?(sexp) && (si = spotty_includes(sexp[3]))
-          scan.add_issue BuggyEagerLoad.new(scan, self.file, sexp, si.modeled_class_name)
+          scan.issues << BuggyEagerLoad.new(scan, self.file, sexp, si.modeled_class_name)
         end
       end
 

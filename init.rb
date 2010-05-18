@@ -54,11 +54,12 @@ unless skip_lint_fu
   #######################################
   # lib/lint_fu/rails
   curdir    = File.join(libdir, 'lint_fu', 'rails')
-  requires << File.join(curdir, 'application_model.rb')
-  requires << File.join(curdir, 'application_model_builder.rb')
+  requires << File.join(curdir, 'model_application.rb')
+  requires << File.join(curdir, 'model_application_builder.rb')
   requires << File.join(curdir, 'buggy_eager_load_checker.rb')
   requires << File.join(curdir, 'sql_injection_checker.rb')
   requires << File.join(curdir, 'unsafe_find_checker.rb')
+  requires << File.join(curdir, 'scan_builder.rb')
 
   #######################################
   # lib/lint_fu/action_pack

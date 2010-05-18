@@ -1,10 +1,10 @@
 module LintFu
   module Rails
-    class ApplicationModelBuilder < ModelElementBuilder
+    class ModelApplicationBuilder < ModelElementBuilder
       def initialize(fs_root)
         super()
         
-        application = ApplicationModel.new(fs_root)
+        application = ModelApplication.new(fs_root)
 
         models_dir = File.join(fs_root, 'app', 'models')
         builder = ActiveRecord::ModelModelBuilder.new
