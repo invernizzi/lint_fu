@@ -28,7 +28,7 @@ module LintFu
 
       #s(:call, nil, :belongs_to, s(:arglist, s(:lit, :relation_name)))
       def process_call(sexp)
-        super(sexp) unless @current_model_element
+        return sexp unless @current_model_element
 
         callee, method, arglist = sexp[1], sexp[2], sexp[3]
         arglist = nil unless arglist[0] == :arglist
