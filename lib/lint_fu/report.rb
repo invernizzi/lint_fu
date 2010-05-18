@@ -29,7 +29,7 @@ module LintFu
       #Build map of contributors to issues they created
 
       @issues_by_author = Hash.new
-      scan.issues.each do |issue|
+      scan.genuine_issues.each do |issue|
         commit, author = scm.blame(issue.relative_file, issue.line)
         @issues_by_author[author] ||= []
         @issues_by_author[author] << issue
@@ -38,7 +38,7 @@ module LintFu
       @authors_by_issue_count = @issues_by_author.keys.sort { |x,y| @issues_by_author[y].size <=> @issues_by_author[x].size }
 
       @issues_by_class = Hash.new
-      scan.issues.each do |issue|
+      scan.genuine_issues.each do |issue|
         klass = issue.class
         @issues_by_class[klass] ||= []
         @issues_by_class[klass] << issue
@@ -46,7 +46,7 @@ module LintFu
 
       #Build map of files to issues they contain
       @issues_by_file = Hash.new
-      scan.issues.each do |issue|
+      scan.genuine_issues.each do |issue|
         @issues_by_file[issue.relative_file] ||= []
         @issues_by_file[issue.relative_file] << issue
       end
@@ -66,7 +66,7 @@ module LintFu
         end
         html.body do |body|
           body.h1 'Summary'
-          body.p "#{scan.issues.size} issues found."
+          body.p "#{scan.genuine_issues.size} issues found."
 
           body.h2 'Issues by Type'
           body.table do |table|
@@ -220,7 +220,7 @@ module LintFu
     def generate(output_stream)
       counter = 1
 
-      scan.issues.each do |issue|
+      scan.genuine_issues.each do |issue|
         #commit, author = scm.blame(issue.relative_file, issue.line)
         output_stream.puts " #{counter}) Failure:"
         output_stream.puts "#{issue.brief}, #{issue.relative_file}:#{issue.line}"
