@@ -4,10 +4,21 @@ require File.expand_path(File.join(File.dirname(__FILE__), '..', 'init.rb'))
 if defined?(LintFu)
   desc "Perform static analysis of the source code to find common security and correctness issues."
   task :lint do
-    CHECKERS = [LintFu::Rails::UnsafeFindChecker, LintFu::Rails::BuggyEagerLoadChecker, LintFu::Rails::SqlInjectionChecker]
-    scan, scm = perform_scan(CHECKERS)
+    @scm    = LintFu::SourceControlProvider.for_directory(RAILS_ROOT)
 
-    if scan.issues.empty?
+    #Build a model of the application we are scanning.
+    timed("Build a model of the application") do
+      builder = LintFu::Rails::ApplicationModelBuilder.new(RAILS_ROOT)
+      @application = builder.model_elements[0]
+      raise LintFu::ProviderError.new("Unable to identify the source control provider for #{RAILS_ROOT}") unless @scm
+    end
+
+    #Using the model we built, scan the controllers for security bugs.
+    timed("Scan the application") do
+      @scan = @application.perform_scan
+    end
+
+    if @scan.genuine_issues.empty?
       puts "Clean scan: no issues found. Skipping report."
       exit(0)
     end
@@ -32,12 +43,12 @@ if defined?(LintFu)
     klass    = LintFu.const_get(typename.to_sym)
 
     timed("Generate report") do
-      klass.new(scan, scm).generate(output)
+      klass.new(@scan, @scm).generate(output)
       output.close
     end
 
     system("open #{output_name}") if (output != STDOUT && STDOUT.tty?)
-    exit( [scan.issues.size, 255].min )
+    exit( [@scan.genuine_issues.size, 255].min )
   end
 
   private
@@ -56,34 +67,5 @@ if defined?(LintFu)
       puts "done"
       STDOUT.flush
     end
-  end
-
-  def perform_scan(controller_checkers)
-    scan    = LintFu::Scan.new(RAILS_ROOT)
-    scm     = LintFu::SourceControlProvider.for_directory(RAILS_ROOT)
-    builder = nil
-    context = nil
-
-    #Build a model of the application we are scanning.
-    timed("Build a model of the application") do
-      builder = LintFu::Rails::ApplicationModelBuilder.new(RAILS_ROOT)
-      context = builder.application
-      raise LintFu::ProviderError.new("Unable to identify the source control provider for #{RAILS_ROOT}") unless scm
-    end
-
-    #Using the model we built, scan the controllers for security bugs.
-    timed("Scan controllers") do
-      controllers_dir = File.join(RAILS_ROOT, 'app', 'controllers')
-      Dir.glob(File.join(controllers_dir, '**', '*.rb')).each do |filename|
-        contents = File.read(filename)
-        parser = RubyParser.new
-        sexp = parser.parse(contents, filename)
-        visitor = LintFu::GenericVisitor.new
-        controller_checkers.each { |klass| visitor.observers << klass.new(scan, context, filename) }
-        visitor.process(sexp)
-      end
-    end
-
-    return [scan, scm]
   end
 end

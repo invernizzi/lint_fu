@@ -1,12 +1,16 @@
 module LintFu
   module ActiveRecord
     class ModelModelBuilder < ModelElementBuilder
+      SIGNATURE_SEXP = s(:colon2, s(:const, :ActiveRecord), :Base)      
+
       SINGULAR_ASSOCS = Set.new([:belongs_to, :has_one])
       PLURAL_ASSOCS   = Set.new([:has_many, :has_and_belongs_to_many])
       ASSOCS          = SINGULAR_ASSOCS + PLURAL_ASSOCS
 
       #sexp:: [:class, <classname>, <superclass|nil>, <CLASS DEFS>]
       def process_class(sexp)
+        return super(sexp) unless sexp[2] && sexp[2] == SIGNATURE_SEXP
+
         unless @current_model_element
           @current_model_element = ModelModel.new(sexp, self.namespace)
           did_element = true
@@ -24,6 +28,8 @@ module LintFu
 
       #s(:call, nil, :belongs_to, s(:arglist, s(:lit, :relation_name)))
       def process_call(sexp)
+        super(sexp) unless @current_model_element
+
         callee, method, arglist = sexp[1], sexp[2], sexp[3]
         arglist = nil unless arglist[0] == :arglist
         discover_associations(callee, method, arglist)

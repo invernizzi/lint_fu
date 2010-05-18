@@ -61,6 +61,12 @@ unless skip_lint_fu
   requires << File.join(curdir, 'unsafe_find_checker.rb')
 
   #######################################
+  # lib/lint_fu/action_pack
+  curdir    = File.join(libdir, 'lint_fu', 'action_pack')
+  requires << File.join(curdir, 'model_controller.rb')
+  requires << File.join(curdir, 'model_controller_builder.rb')
+
+  #######################################
   # lib/lint_fu/source_control
   curdir    = File.join(libdir, 'lint_fu', 'source_control')
   requires << File.join(curdir, 'git.rb')

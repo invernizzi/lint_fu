@@ -1,24 +1,33 @@
 module LintFu
   module Rails
-    class ApplicationModelBuilder
-      attr_reader :application
+    class ApplicationModelBuilder < ModelElementBuilder
+      def initialize(fs_root)
+        super()
+        
+        application = ApplicationModel.new(fs_root)
 
-      def initialize(rails_root)
-        @application = ApplicationModel.new
-
-        models_dir = File.join(rails_root, 'app', 'models')
-        model_builder = ActiveRecord::ModelModelBuilder.new
-
-        #Parse all of the models and build ModelElements for each
+        models_dir = File.join(fs_root, 'app', 'models')
+        builder = ActiveRecord::ModelModelBuilder.new
         #TODO ensure the Rails app is using ActiveRecord
         Dir.glob(File.join(models_dir, '**', '*.rb')).each do |f|
           contents = File.read(f)
           sexp = RubyParser.new.parse(contents)
           sexp.file = f
-          model_builder.process(sexp)
+          builder.process(sexp)
         end
+        builder.model_elements.each { |elem| application.add_submodel(elem) }
 
-        model_builder.model_elements.each { |elem| @application.add_submodel(elem) }
+        controllers_dir = File.join(fs_root, 'app', 'controllers')
+        builder = ActionPack::ModelControllerBuilder.new
+        Dir.glob(File.join(controllers_dir, '**', '*.rb')).each do |f|
+          contents = File.read(f)
+          sexp = RubyParser.new.parse(contents)
+          sexp.file = f
+          builder.process(sexp)
+        end
+        builder.model_elements.each { |elem| application.add_submodel(elem) }
+
+        self.model_elements << application        
       end
     end
   end

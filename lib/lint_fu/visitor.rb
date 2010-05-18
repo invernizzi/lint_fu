@@ -1,5 +1,5 @@
 module LintFu
-  class GenericVisitor < SexpProcessor
+  class Visitor < SexpProcessor
     attr_reader :observers
     
     def initialize
