@@ -1,8 +1,14 @@
 module LintFu
   module Rails
     class UnsafeFind < Issue
+      def initialize(scan, file, sexp, subject)
+        super(scan, file, sexp)
+        @subject = subject
+      end
+
+
       def detail
-        return "Could a bad guy make this finder return things he shouldn't be able to get?"
+        return "Could a bad guy manipulate <code>#{@subject}</code> and get/change stuff he shouldn't?"
       end
       
       def reference_info
@@ -80,7 +86,7 @@ EOF
           call   = sexp[2].to_s
           params = sexp[3]
           if finder?(type, call) && !params.constant? && !sexp_contains_scope?(params)
-            scan.issues << UnsafeFind.new(scan, self.file, sexp)
+            scan.issues << UnsafeFind.new(scan, self.file, sexp, params.to_ruby_string)
           end
         end        
       end
