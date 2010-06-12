@@ -1,0 +1,20 @@
+= LintFu
+
+Lint-Fu uses some very basic static analysis tricks to find bugs in your Rails
+app. It produces a report (HTML format by default) explaining what it found.
+
+Although Lint-Fu was built for Rails applications, it is modular and extensible
+and rules can be developed for any framework or toolkit, or even for Ruby code
+in general.
+
+Lint-Fu's capabilities are limited to semantic and structural analysis of the
+code; it does model data or control flow. This means it spots a *very small*
+subset of all potential bugs that it knows how to look for. Furthermore, it
+will sometimes report false positives.
+
+= Example
+
+$ rake lint
+
+
+Copyright (c) 2009 Tony Spataro, released under the MIT license
