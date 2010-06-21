@@ -29,8 +29,11 @@ if defined?(LintFu)
     output_dir = ENV['CC_BUILD_ARTIFACTS'] || RAILS_ROOT
     mkdir_p output_dir unless File.directory?(output_dir)
 
+    flavor   = ENV['FORMAT'] || 'html'
+    typename = "#{flavor}_report".camelize
+
     #Use a filename (or STDOUT) for our report that corresponds to its format
-    case (flavor = ENV['FORMAT'] || 'html')
+    case flavor
       when 'html'
         output_name = File.join(output_dir, 'lint.html')
         output      = File.open(output_name, 'w')
@@ -41,7 +44,6 @@ if defined?(LintFu)
         exit -1
     end
 
-    typename = "#{flavor}_report".camelize
     klass    = LintFu.const_get(typename.to_sym)
 
     timed("Generate report") do
@@ -50,7 +52,7 @@ if defined?(LintFu)
     end
 
     system("open #{output_name}") if (output != STDOUT && STDOUT.tty?)
-    exit( [@genuine_issues.size, 255].min )
+    exit( @genuine_issues.size > 0 ? 42 : 0 )
   end
 
   private
