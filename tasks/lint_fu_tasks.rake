@@ -51,8 +51,22 @@ if defined?(LintFu)
       output.close
     end
 
+    #Support automation jobs that need to distinguish between failure due to
+    #broken environment and failure to due issues that were genuinely found by
+    #the lint task.
+    if ENV['STATUS_IF_ISSUES']
+      if(@genuine_issues.size > 0)
+        retval = ENV['STATUS_IF_ISSUES'].to_i
+      else
+        retval = 0
+      end
+    else
+      retval = [@genuine_issues.size, 255].min
+    end
+
     system("open #{output_name}") if (output != STDOUT && STDOUT.tty?)
-    exit( @genuine_issues.size > 0 ? 42 : 0 )
+
+    exit( retval )
   end
 
   private
