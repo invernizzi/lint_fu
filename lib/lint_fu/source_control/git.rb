@@ -45,7 +45,7 @@ module LintFu
           output = `git blame --date=short #{blame ? '' : '-s'} -w -L #{start_line},#{end_line} #{relative_path}`
           return output.split("\n") if $?.success?
 
-          raise ProviderError.new("'git blame' failed with code #{$?.to_i}: #{output}")
+          raise ProviderError.new("'git blame' failed with code #{$?.exitstatus}: #{output}")
         end
       end
     end
