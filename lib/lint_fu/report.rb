@@ -58,7 +58,8 @@ module LintFu
       @files_by_name = @issues_by_file.keys.sort { |x,y| x <=> y }
 
       #Write the report in HTML format
-      x = Builder::XmlMarkup.new(:target => output_stream, :indent => 0)
+      x = Builder::XmlMarkup.new(:target => output_stream, :indent => 2)
+      x << %Q{<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n}
       x.html do |html|
         html.head do |head|
           head.title 'Static Analysis Results'
@@ -86,7 +87,7 @@ module LintFu
                   tr.td(issues.size.to_s)
                   tr.td do |td|
                     issues.each do |issue|
-                      td.a(issue.hash[0..4], :href=>"#issue_#{issue.hash}")
+                      td.a(issue.issue_hash[0..4], :href=>"#issue_#{issue.issue_hash}")
                       td.text!(' ')
                     end
                   end
@@ -111,7 +112,7 @@ module LintFu
                   tr.td(@issues_by_author[author].size.to_s)
                   tr.td do |td|
                     @issues_by_author[author].each do |issue|
-                      td.a(issue.hash[0..4], :href=>"#issue_#{issue.hash}")
+                      td.a(issue.issue_hash[0..4], :href=>"#issue_#{issue.issue_hash}")
                       td.text!(' ')
                     end
                   end
@@ -136,7 +137,7 @@ module LintFu
                   tr.td(@issues_by_file[file].size.to_s)
                   tr.td do |td|
                     @issues_by_file[file].each do |issue|
-                      td.a(issue.hash[0..4], :href=>"#issue_#{issue.hash}")
+                      td.a(issue.issue_hash[0..4], :href=>"#issue_#{issue.issue_hash}")
                       td.text!(' ')
                     end
                   end
@@ -152,20 +153,20 @@ module LintFu
             issues = @issues_by_file[file]
             issues = issues.to_a.sort { |x,y| x.line <=> y.line }
             issues.each do |issue|
-              body.div(:class=>'issue', :id=>"issue_#{issue.hash}") do |div|
-                div.h4 do |h4|
-                  reference_link(div, issue)
+              body.div(:class=>'issue', :id=>"issue_#{issue.issue_hash}") do |div_issue|
+                div_issue.h4 do |h4|
+                  reference_link(div_issue, issue)
                   h4.text! ", #{File.basename(issue.file)}:#{issue.line}"
                 end
-                div.span(:class=>'detail') do |span|
-                  span << RedCloth.new(issue.detail).to_html
+                div_issue.div(:class=>'detail') do |div_detail|
+                  div_detail << RedCloth.new(issue.detail).to_html
                 end
 
                 first   = issue.line-3
                 first   = 1 if first < 1
                 last    = issue.line + 3
                 excerpt = scm.excerpt(issue.file, (first..last), :blame=>false)
-                highlighted_code_snippet(div, excerpt, first, issue.line)
+                highlighted_code_snippet(div_issue, excerpt, first, issue.line)
               end
             end
           end
@@ -196,17 +197,20 @@ module LintFu
     end
 
     def include_external_javascripts(head)
-      head.script(:src=>'http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js', :type=>'text/javascript')
-      head.script(:src=>'http://gdata-samples.googlecode.com/svn/!svn/bc/178/trunk/oauth_playground/js/thickbox-compressed.js', :type=>'text/javascript')
-      head.script(:src=>'http://xregexp.com/xregexp-min.js', :type=>'text/javascript')
-      head.script(:src=>'http://bitbucket.org/alexg/syntaxhighlighter/raw/378fedcc2759/scripts/shCore.js', :type=>'text/javascript')
-      head.script(:src=>'http://bitbucket.org/alexg/syntaxhighlighter/raw/378fedcc2759/scripts/shBrushRuby.js', :type=>'text/javascript')
+      #Note that we pass an empty block {} to the script tag in order to make
+      #Builder create a beginning-and-end tag; most browsers won't parse
+      #"empty" script tags even if they point to a src!!!      
+      head.script(:src=>'http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js', :type=>'text/javascript') {}
+      head.script(:src=>'https://s3.amazonaws.com/lint_fu/assets/js/thickbox.min.js', :type=>'text/javascript') {}
+      head.script(:src=>'https://s3.amazonaws.com/lint_fu/assets/js/xregexp.min.js', :type=>'text/javascript') {}
+      head.script(:src=>'https://s3.amazonaws.com/lint_fu/assets/js/shCore.js', :type=>'text/javascript') {}
+      head.script(:src=>'https://s3.amazonaws.com/lint_fu/assets/js/shBrushRuby.js', :type=>'text/javascript') {}
     end
 
     def include_external_stylesheets(head)
-      head.link(:rel=>'stylesheet', :type=>'text/css', :href=>'http://gdata-samples.googlecode.com/svn/!svn/bc/178/trunk/oauth_playground/css/thickbox.css')
-      head.link(:rel=>'stylesheet', :type=>'text/css', :href=>'http://bitbucket.org/alexg/syntaxhighlighter/raw/378fedcc2759/styles/shCore.css')
-      head.link(:rel=>'stylesheet', :type=>'text/css', :href=>'http://bitbucket.org/alexg/syntaxhighlighter/raw/378fedcc2759/styles/shThemeDefault.css')
+      head.link(:rel=>'stylesheet', :type=>'text/css', :href=>'https://s3.amazonaws.com/lint_fu/assets/css/thickbox.css')
+      head.link(:rel=>'stylesheet', :type=>'text/css', :href=>'https://s3.amazonaws.com/lint_fu/assets/css/shCore.css')
+      head.link(:rel=>'stylesheet', :type=>'text/css', :href=>'https://s3.amazonaws.com/lint_fu/assets/css/shThemeDefault.css')
     end
 
     def id_for_issue_class(klass)

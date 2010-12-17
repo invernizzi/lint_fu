@@ -33,7 +33,7 @@ module LintFu
       File.basename(file)
     end
 
-    def hash()
+    def issue_hash()
       Digest::SHA1.hexdigest("#{self.class.name} - #{self.relative_file} - #{sexp.fingerprint}")
     end
 

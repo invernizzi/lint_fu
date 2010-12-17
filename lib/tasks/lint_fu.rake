@@ -1,4 +1,4 @@
-require File.expand_path(File.join(File.dirname(__FILE__), '..', 'init.rb'))
+require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'init.rb'))
 
 #Only define the Rake tasks if the plugin loaded successfully
 if defined?(LintFu)
