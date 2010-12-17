@@ -3,8 +3,8 @@ module LintFu
   
   class Scan
     COMMENT                  = /^\s*#/
-    VERBOSE_BLESSING_COMMENT = /#\s*(lint|security)\s*[-:]\s*not\s*a?n?\s*([a-z0-9 ]*) ?(as|because|;)\s*(.*)/i
-    BLESSING_COMMENT         = /#\s*(lint|security)\s*[-:]\s*not\s*a?n?\s*([a-z0-9 ]*)/i
+    VERBOSE_BLESSING_COMMENT = /#\s*(lint|security)\s*[-:]\s*not\s*a?n?\s*([a-z0-9 ]*?) ?(as|because|;)\s*(.*)\s*/i
+    BLESSING_COMMENT         = /#\s*(lint|security)\s*[-:]\s*not\s*a?n?\s*([a-z0-9 ]*?)\s*/i
 
     attr_reader :fs_root, :issues
 
