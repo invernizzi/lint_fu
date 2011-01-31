@@ -43,7 +43,7 @@ If a named scope is not convenient, include conditions that scope the query:
 
 bc. BankAccount.find(:conditions=>{:owner_id=>current_user})
 
-If your authorization rules are so complex that neither of those approaches work, always make sure to peform authorization youself:
+If your authorization rules are so complex that neither of those approaches work, always make sure to perform authorization yourself:
 
 bc. #My bank allows customers to access ANY account on their birthday
 @bank_account = BankAccount.first(params[:id])
