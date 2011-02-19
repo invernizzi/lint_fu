@@ -24,7 +24,7 @@ Some trivial examples:
 bc. BankAccount.first(params[:id]).destroy
 Account.all(:conditions=>{:nickname=>params[:nickname]})
 
-In reality, it often hard to determine whether a find is safe. Authorization can happen in many ways and the "right" way to do it depends on the application requirements.
+In reality, it is often hard to determine whether a find is safe. Authorization can happen in many ways and the "right" way to do it depends on the application requirements.
 
 Here are some things to consider when evaluating whether a find is safe:
 

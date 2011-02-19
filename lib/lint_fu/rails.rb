@@ -1,0 +1,6 @@
+require 'lint_fu/rails/model_application'
+require 'lint_fu/rails/model_application_builder'
+require 'lint_fu/rails/buggy_eager_load_checker'
+require 'lint_fu/rails/sql_injection_checker'
+require 'lint_fu/rails/unsafe_find_checker'
+require 'lint_fu/rails/scan_builder'

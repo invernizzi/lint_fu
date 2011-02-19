@@ -7,24 +7,25 @@ spec = Gem::Specification.new do |s|
   s.required_ruby_version = Gem::Requirement.new(">= 1.8.7")
 
   s.name    = 'lint_fu'
-  s.version = '0.8'
-  s.date    = '2010-06-11'
+  s.version = '0.5.0'
+  s.date    = '2011-02-19'
 
   s.authors = ['Tony Spataro']
   s.email   = 'code@tracker.xeger.net'
   s.homepage= 'http://github.com/xeger/lint_fu'
   
-  s.summary = %q{Security scanner that performs static analysis of Rails code.}
-  s.description = %q{This plugin for Rails can find (some!) security defects in your code.}
+  s.summary = %q{Security scanner that performs static analysis of Ruby code.}
+  s.description = %q{This tool helps identify bugs in your code. It is Rails-centric but its modular design allows support for other application frameworks.}
 
-  s.add_runtime_dependency('ruby_parser', [">= 2.0.4"])
-  s.add_runtime_dependency('ruby2ruby', [">= 1.2.4"])
-  s.add_runtime_dependency('activesupport', [">= 2.1.2"])
+  s.add_runtime_dependency('ruby_parser', ["~> 2.0"])
+  s.add_runtime_dependency('ruby2ruby', ["~> 1.2"])
+  s.add_runtime_dependency('activesupport', ["~> 2.3"])
 
-  basedir = File.dirname(__FILE__)
-  candidates = ['lint_fu.gemspec', 'init.rb', 'MIT-LICENSE', 'README.rdoc'] +
-            Dir['lib/**/*'] +
-            Dir['tasks/**/*']
+  s.executables = ["lint_fu"]
+
+  candidates = ['lint_fu.gemspec', 'MIT-LICENSE', 'README.rdoc'] +
+               Dir['lib/**/*'] +
+               Dir['bin/*']  
   s.files = candidates.sort
 end
 

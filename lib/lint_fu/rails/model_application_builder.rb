@@ -10,9 +10,7 @@ module LintFu
         builder = ActiveRecord::ModelModelBuilder.new
         #TODO ensure the Rails app is using ActiveRecord
         Dir.glob(File.join(models_dir, '**', '*.rb')).each do |f|
-          contents = File.read(f)
-          sexp = RubyParser.new.parse(contents)
-          sexp.file = f
+          sexp = Parser.parse_ruby(f)
           builder.process(sexp)
         end
         builder.model_elements.each { |elem| application.add_submodel(elem) }

@@ -4,20 +4,12 @@ require 'spec/rake/spectask'
 require 'rake/rdoctask'
 
 desc "Run unit tests"
-task :default => :spec
-
-desc "Run unit tests"
-Spec::Rake::SpecTask.new do |t|
-  t.spec_files = Dir['**/*_spec.rb']
-  t.spec_opts = lambda do
-    IO.readlines(File.join(File.dirname(__FILE__), 'spec', 'spec.opts')).map {|l| l.chomp.split " "}.flatten
-  end
-end
+task :default => :gem
 
 desc 'Generate documentation for the lint_fu plugin.'
 Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title    = 'Lint-Fu'
+  rdoc.title    = 'lint-fu'
   rdoc.options << '--line-numbers' << '--inline-source'
   rdoc.rdoc_files.include('README.rdoc')
   rdoc.rdoc_files.include('lib/**/*.rb')

@@ -1,0 +1,6 @@
+Create plugin architecture that will load model builders and checkers for various app frameworks.
+
+Make CLI more elegant (class for CLI; options; etc.)
+
+Create a Cucumber feature suite
+
