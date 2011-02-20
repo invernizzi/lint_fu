@@ -2,8 +2,7 @@ module LintFu
   module Parser
     def self.parse_ruby(filename)
       contents = File.read(filename)
-      sexp = RubyParser.new.parse(contents)
-      sexp.file = filename
+      sexp = RubyParser.new.parse(contents, filename)
       return sexp
     rescue SyntaxError => e
       e2 = SyntaxError.new "In #{filename}: #{e.message}"

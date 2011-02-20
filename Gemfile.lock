@@ -1,0 +1,27 @@
+PATH
+  remote: .
+  specs:
+    lint_fu (0.5.1)
+      activesupport (~> 2.3)
+      ruby2ruby (~> 1.2)
+      ruby_parser (~> 2.0)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    activesupport (2.3.11)
+    ruby2ruby (1.2.5)
+      ruby_parser (~> 2.0)
+      sexp_processor (~> 3.0)
+    ruby_parser (2.0.6)
+      sexp_processor (~> 3.0)
+    sexp_processor (3.0.5)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  activesupport (~> 2.3)
+  lint_fu!
+  ruby2ruby (~> 1.2)
+  ruby_parser (~> 2.0)

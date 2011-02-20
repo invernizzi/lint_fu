@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- mode: ruby; encoding: utf-8 -*-
 
 require 'rubygems'
 
@@ -7,7 +7,7 @@ spec = Gem::Specification.new do |s|
   s.required_ruby_version = Gem::Requirement.new(">= 1.8.7")
 
   s.name    = 'lint_fu'
-  s.version = '0.5.0'
+  s.version = '0.5.1'
   s.date    = '2011-02-19'
 
   s.authors = ['Tony Spataro']
@@ -27,9 +27,4 @@ spec = Gem::Specification.new do |s|
                Dir['lib/**/*'] +
                Dir['bin/*']  
   s.files = candidates.sort
-end
-
-if $PROGRAM_NAME == __FILE__
-   Gem.manage_gems if Gem::RubyGemsVersion.to_f < 1.0
-   Gem::Builder.new(spec).build
 end

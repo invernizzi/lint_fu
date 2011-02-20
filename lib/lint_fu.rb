@@ -29,6 +29,4 @@ require 'lint_fu/report'
 require 'lint_fu/source_control/git'
 
 # lint-fu plugins
-require 'lint_fu/active_record'
-require 'lint_fu/action_pack'
-require 'lint_fu/rails'
+require 'lint_fu/plugins'

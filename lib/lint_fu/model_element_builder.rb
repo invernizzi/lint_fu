@@ -25,5 +25,9 @@ module LintFu
       @namespace.pop
       return sexp
     end
+
+    def build
+      raise NotImplemented      
+    end
   end
 end

@@ -1,6 +1,6 @@
-module LintFu
+module LintFu::Plugins
   module Rails
-    class SqlInjection < Issue
+    class SqlInjection < LintFu::Issue
       def initialize(scan, file, sexp, subject, confidence=1.0)
         super(scan, file, sexp, confidence)
         @subject = subject
@@ -44,7 +44,7 @@ EOF
 
     # Visit a Rails controller looking for ActiveRecord queries that contain interpolated
     # strings. 
-    class SqlInjectionChecker < Checker
+    class SqlInjectionChecker < LintFu::Checker
       FINDER_REGEXP = /^(find|first|all)(_or_initialize)?(_by_.*_id)?/
       SINK_OPTIONS  = Set.new([:conditions, :select, :order, :group, :from, :include, :join])
       

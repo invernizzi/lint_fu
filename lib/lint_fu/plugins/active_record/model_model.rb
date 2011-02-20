@@ -1,4 +1,4 @@
-module LintFu
+module LintFu::Plugins
   module ActiveRecord
     class ModelModel
       include LintFu::ModelElement

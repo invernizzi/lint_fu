@@ -1,6 +1,6 @@
-module LintFu
+module LintFu::Plugins
   module ActionPack
-    class ModelControllerBuilder < ModelElementBuilder
+    class ModelControllerBuilder < LintFu::ModelElementBuilder
       SIGNATURE_SEXP = s(:colon2, s(:const, :ActionController), :Base)
 
       #sexp:: [:class, <classname>, <superclass|nil>, <CLASS DEFS>]

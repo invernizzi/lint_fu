@@ -1,6 +1,6 @@
-module LintFu
+module LintFu::Plugins
   module ActiveRecord
-    class ModelModelBuilder < ModelElementBuilder
+    class ModelModelBuilder < LintFu::ModelElementBuilder
       SIGNATURE_SEXP = s(:colon2, s(:const, :ActiveRecord), :Base)      
 
       SINGULAR_ASSOCS = Set.new([:belongs_to, :has_one])

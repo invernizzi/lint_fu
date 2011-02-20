@@ -25,21 +25,21 @@ rescue Exception => e
 end
 
 app_root = File.expand_path('.')
-
-#Only define the Rake tasks if the plugin loaded successfully
-@scm    = LintFu::SourceControlProvider.for_directory(app_root)
+@scm = LintFu::SourceControlProvider.for_directory(app_root)
+raise LintFu::ProviderError.new("Unable to identify the source control provider for #{app_root}") unless @scm
 
 #Build a model of the application we are scanning.
 timed("Build a model of the application") do
-  builder = LintFu::Rails::ModelApplicationBuilder.new(app_root)
-  @application = builder.model_elements[0]
-  raise LintFu::ProviderError.new("Unable to identify the source control provider for #{app_root}") unless @scm
+  builder = LintFu::Plugins::Rails.context_builder_for(app_root)
+  builder.build
+  @application = builder.model_elements.first
 end
 
 #Using the model we built, scan the controllers for security bugs.
 timed("Scan the application") do
-  builder = LintFu::Rails::ScanBuilder.new(app_root)
-  @scan = builder.scan(@application)
+  @scan = LintFu::Scan.new(app_root)
+  builder = LintFu::Plugins::Rails.issue_builder_for(app_root)
+  builder.build(@application, @scan)
 end
 
 @genuine_issues = @scan.issues.select { |i| !@scan.blessed?(i) }

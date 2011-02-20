@@ -1,6 +1,6 @@
-module LintFu
+module LintFu::Plugins
   module Rails
-    class UnsafeFind < Issue
+    class UnsafeFind < LintFu::Issue
       def initialize(scan, file, sexp, subject)
         super(scan, file, sexp)
         @subject = subject
@@ -55,7 +55,7 @@ EOF
     # Visit a Rails controller looking for ActiveRecord finders being called in a way that
     # might allow an attacker to perform unauthorized operations on resources, e.g. creating,
     # updating or deleting someone else's records.
-    class UnsafeFindChecker < Checker
+    class UnsafeFindChecker < LintFu::Checker
       FINDER_REGEXP  = /^(find|first|all)(_or_initialize)?(_by_.*_id)?/
 
       #sexp:: s(:class, <class_name>, <superclass>, s(:scope, <class_definition>))
@@ -92,7 +92,7 @@ EOF
       end
 
       def finder?(type, call)
-        type.kind_of?(LintFu::ActiveRecord::ModelModel) &&
+        type.kind_of?(LintFu::Plugins::ActiveRecord::ModelModel) &&
                      ( call =~ FINDER_REGEXP || type.associations.has_key?(call) )
       end
 

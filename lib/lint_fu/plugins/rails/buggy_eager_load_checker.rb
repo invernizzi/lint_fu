@@ -1,6 +1,6 @@
-module LintFu
+module LintFu::Plugins
   module Rails
-    class BuggyEagerLoad < Issue
+    class BuggyEagerLoad < LintFu::Issue
       def initialize(scan, file, sexp, subject)
         super(scan, file, sexp)
         @subject = subject
@@ -39,7 +39,7 @@ EOF
     end
     
     # Visit a Rails controller looking for troublesome stuff
-    class BuggyEagerLoadChecker < Checker
+    class BuggyEagerLoadChecker < LintFu::Checker
       FINDER_REGEXP  = /^(find|first|all)(_or_initialize)?(_by_.*)?/
 
       #sexp:: s(:call, <target>, <method_name>, s(:arglist))
