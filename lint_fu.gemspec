@@ -20,6 +20,7 @@ spec = Gem::Specification.new do |s|
   s.add_runtime_dependency('ruby_parser', ["~> 2.0"])
   s.add_runtime_dependency('ruby2ruby', ["~> 1.2"])
   s.add_runtime_dependency('activesupport', ["~> 2.3"])
+  s.add_runtime_dependency('RedCloth', ["~> 4.2"])
 
   s.executables = ["lint_fu"]
 
