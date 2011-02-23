@@ -1,25 +1,28 @@
 module LintFu
   module Mixins
     module SexpInstanceMethods
+      WHOLE_LINE_COMMENT = /^\s*#/
+
       def deep_clone
         Marshal.load(Marshal.dump(self))
       end
 
-      #Return a version of this Sexp that preserves the structure of the original, but with
-      #any specific names, quantities or other values replaced with nil. The fingerprint of
-      #a given chunk of code will tend to remain the same over time, even if variable names
-      #or other inconsequential details are changed.
-      #TODO actually implement this method
+      # Return a version of this Sexp that preserves the structure of the original, but with
+      # any specific names, quantities or other values replaced with nil. The fingerprint of
+      # a given chunk of code will tend to remain the same over time, even if variable names
+      # or other inconsequential details are changed.
       def fingerprint
+        #TODO actually implement this method
         self
       end
 
-      #Generate a human-readable description for this sexp that is similar to source code.
+      # Generate a human-readable description for this sexp that is similar to source code.
       def to_ruby_string
         Ruby2Ruby.new.process(self.deep_clone)
       end
 
-      # Translate a sexp containing a Ruby data literal (string, int, array, hash, etc) into the equivalent Ruby object.
+      # Translate a sexp containing a Ruby data literal (string, int, array, hash, etc) into
+      # the equivalent Ruby object.
       def to_ruby(options={})
         typ = self[0]
 
@@ -101,6 +104,27 @@ module LintFu
 
         return nil if results.empty?
         return results
+      end
+
+      def preceding_comments
+        cont = File.readlines(self.file)
+
+        comments = ''
+
+        max_line = self.line - 1 - 1
+        max_line = 0 if max_line < 0
+        min_line = max_line
+
+        while cont[min_line] =~ WHOLE_LINE_COMMENT && min_line >= 0
+          min_line -= 1
+        end
+
+        if cont[max_line] =~ WHOLE_LINE_COMMENT
+          min_line +=1 unless min_line == max_line
+          return cont[min_line..max_line]
+        else
+          return nil
+        end
       end
     end
   end

@@ -2,7 +2,6 @@ module LintFu
   class ScanNotFinalized < Exception; end
   
   class Scan
-    COMMENT                  = /^\s*#/
     VERBOSE_BLESSING_COMMENT = /#\s*(lint|security)\s*[-:]\s*not\s*a?n?\s*([a-z0-9 ]*?) ?(as|because|;)\s*(.*)\s*/i
     BLESSING_COMMENT         = /#\s*(lint|security)\s*[-:]\s*not\s*a?n?\s*([a-z0-9 ]*?)\s*/i
 
@@ -14,7 +13,7 @@ module LintFu
     end
 
     def blessed?(issue)
-      comments = preceeding_comments(issue.sexp)
+      comments = issue.sexp.preceding_comments
       return false unless comments
 
       match = nil
@@ -37,28 +36,5 @@ module LintFu
 
       return false
     end
-
-    def preceeding_comments(sexp)
-      @file_contents ||= {}
-      @file_contents[sexp.file] ||= File.readlines(sexp.file)
-      cont = @file_contents[sexp.file]
-
-      comments = ''
-
-      max_line = sexp.line - 1 - 1
-      max_line = 0 if max_line < 0
-      min_line = max_line
-
-      while cont[min_line] =~ COMMENT && min_line >= 0
-        min_line -= 1
-      end
-
-      if cont[max_line] =~ COMMENT
-        min_line +=1 unless min_line == max_line
-        return cont[min_line..max_line]
-      else
-        return nil
-      end
-    end    
   end
 end

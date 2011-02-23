@@ -25,8 +25,11 @@ require 'lint_fu/visitor'
 require 'lint_fu/scan'
 require 'lint_fu/report'
 
-# lint-fu source control providers
+# source control providers
 require 'lint_fu/source_control/git'
 
-# lint-fu plugins
+# plugins
 require 'lint_fu/plugins'
+
+# command line interface
+require 'lint_fu/cli'

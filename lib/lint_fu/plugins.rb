@@ -1,9 +1,7 @@
+#Ensure the module's namespace exists, so plugin authors can
+#abbreviate the namespace decls in their files.
 module LintFu
   module Plugins
-    def self.register(mod)
-      @registry ||= Set.new
-      @registry << mod
-    end
   end
 end
 

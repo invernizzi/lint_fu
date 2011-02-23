@@ -27,6 +27,4 @@ module LintFu::Plugins
       IssueBuilder.new(dir)
     end
   end
-
-  register Rails
 end
