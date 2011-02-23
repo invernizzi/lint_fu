@@ -17,6 +17,7 @@ require 'lint_fu/mixins'
 # Core lint-fu sources
 require 'lint_fu/parser'
 require 'lint_fu/model_element'
+require 'lint_fu/super_model'
 require 'lint_fu/model_element_builder'
 require 'lint_fu/source_control_provider'
 require 'lint_fu/issue'

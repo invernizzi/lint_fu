@@ -7,16 +7,16 @@ module LintFu::Plugins
       def process_class(sexp)
         return super(sexp) unless sexp[2] && sexp[2] == SIGNATURE_SEXP
         
-        unless @current_model_element
-          @current_model_element = ModelController.new(sexp, self.namespace)
+        unless self.current_model_element
+          self.current_model_element = ModelController.new(sexp, self.namespace)
           did_element = true
         end
 
         ret = super(sexp)
 
         if did_element
-          self.model_elements.push @current_model_element
-          @current_model_element = nil
+          self.model_elements.push self.current_model_element
+          self.current_model_element = nil
         end
 
         return ret

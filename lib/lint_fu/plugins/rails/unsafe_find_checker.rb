@@ -60,17 +60,20 @@ EOF
 
       #sexp:: s(:class, <class_name>, <superclass>, s(:scope, <class_definition>))
       def observe_class_begin(sexp)
+        super(sexp)
         #TODO get rid of RightScale-specific assumption
         @in_admin_controller = !!(sexp[1].to_ruby_string =~ /^Admin/)
       end
 
       #sexp:: s(:class, <class_name>, <superclass>, s(:scope, <class_definition>))
       def observe_class_end(sexp)
+        super(sexp)
         @in_admin_controller = false
       end
 
       #sexp:: s(:call, <target>, <method_name>, s(:arglist))
       def observe_call(sexp)
+        super(sexp)
         check_suspicious_finder(sexp)
       end
 
@@ -85,7 +88,8 @@ EOF
           type = self.context.models.detect { |m| m.modeled_class_name == name }
           call   = sexp[2].to_s
           params = sexp[3]
-          if finder?(type, call) && !params.constant? && !sexp_contains_scope?(params)
+          if finder?(type, call) && !params.constant? &&
+             !sexp_contains_scope?(params) && !suppressed?(UnsafeFind)
             scan.issues << UnsafeFind.new(scan, self.file, sexp, params.to_ruby_string)
           end
         end        

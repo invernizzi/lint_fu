@@ -1,6 +1,7 @@
 module LintFu
   class ModelElementBuilder < SexpProcessor
-    attr_reader :model_elements, :namespace
+    attr_reader   :namespace, :model_elements
+    attr_accessor :current_model_element
     
     def initialize(namespace=nil)
       super()

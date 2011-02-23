@@ -3,3 +3,7 @@ Finish plugin architecture - only load the plugins that apply to a specific proj
 Make CLI more elegant (options parsing, banner, help, etc)
 
 Create a Cucumber feature suite
+
+Unify the "bless" and "suppress" features
+  * make them live in the same place (Checker?)
+  * allow for suppression in any scope (class/module/method), not just class

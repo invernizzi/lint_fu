@@ -44,8 +44,9 @@ EOF
 
       #sexp:: s(:call, <target>, <method_name>, s(:arglist))
       def observe_call(sexp)
+        super(sexp)
         return unless finder?(sexp)
-        if finder?(sexp) && (si = spotty_includes(sexp[3]))
+        if finder?(sexp) && (si = spotty_includes(sexp[3])) && !suppressed?(UnsafeFind)
           scan.issues << BuggyEagerLoad.new(scan, self.file, sexp, si.modeled_class_name)
         end
       end

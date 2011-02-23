@@ -55,30 +55,34 @@ EOF
       end
 
       def observe_class_begin(sexp)
+        super(sexp)
         @class_definition_scope.push sexp
       end
 
       def observe_class_end(sexp)
+        super(sexp)
         @class_definition_scope.pop
       end
 
       def observe_defn_begin(sexp)
-        
+        super(sexp)
         @in_method = true
       end
 
       def observe_defn_end(sexp)
+        super(sexp)
         @in_method = false
       end
 
       def observe_call(sexp)
+        super(sexp)
         return if @class_definition_scope.empty? || !@in_method
 
         call    = sexp[2].to_s
         arglist = sexp[3]
 
         tp = tainted_params(arglist)
-        if finder?(call) && !tp.empty?
+        if finder?(call) && !tp.empty? && !suppressed?(UnsafeFind)
           scan.issues << SqlInjection.new(scan, self.file, sexp, tp[0].to_ruby_string, @base_confidence)
         end
       end
