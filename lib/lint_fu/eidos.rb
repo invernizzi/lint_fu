@@ -1,11 +1,16 @@
 module LintFu
-  # An element of the static analysis model being created; generally corresponds to a
-  # class (e.g. model, controller or view) within the application being scanned.
-  module ModelElement
-    attr_accessor :supermodel
+  # An eidos (plural: eide) holds information about a Ruby class, module or other
+  # relevant piece of code. The name comes from Plato's theory of forms; the
+  # eidos is the universal abstraction of an entire class of objects.
+  #
+  # Eide are built during the first pass of static analysis by parsing all source
+  # files in the project. On the second pass, the checkers parse selected bits of
+  # code, using the eide to better understand the code they are parsing. 
+  module Eidos
+    attr_accessor :parent_eidos
     attr_reader   :modeled_class_name, :modeled_class_superclass_name, :parse_tree
 
-    VALID_SEXPS         = Set.new([:class, :module])
+    VALID_SEXPS = Set.new([:class, :module])
 
     #sexp:: [:class, <classname>, <superclass|nil>, <CLASS DEFS>]
     #namespace:: Array of enclosing module names for this class 

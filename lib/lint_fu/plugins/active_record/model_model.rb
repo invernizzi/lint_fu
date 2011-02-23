@@ -1,7 +1,7 @@
 module LintFu::Plugins
   module ActiveRecord
     class ModelModel
-      include LintFu::ModelElement
+      include LintFu::Eidos
       
       attr_reader :associations
       attr_reader :named_scopes

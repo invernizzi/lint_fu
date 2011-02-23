@@ -9,7 +9,7 @@ module LintFu::CLI
       timed("Build a model of the application") do
         builder = LintFu::Plugins::Rails.context_builder_for(app_root)
         builder.build
-        @application = builder.model_elements.first
+        @application = builder.eide.first
       end
 
       #Using the model we built, scan the controllers for security bugs.

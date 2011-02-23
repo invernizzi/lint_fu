@@ -3,18 +3,18 @@ module LintFu::Plugins
     class ModelApplication
       attr_reader :fs_root
       
-      include LintFu::SuperModel
+      include LintFu::EidosContainer
 
       def initialize(fs_root)
         @fs_root = fs_root
       end
 
       def controllers
-        submodels.select { |m| m.kind_of?(LintFu::Plugins::ActionPack::ModelController) }
+        eide.select { |m| m.kind_of?(LintFu::Plugins::ActionPack::ModelController) }
       end
 
       def models
-        submodels.select { |m| m.kind_of?(LintFu::Plugins::ActiveRecord::ModelModel) }
+        eide.select { |m| m.kind_of?(LintFu::Plugins::ActiveRecord::ModelModel) }
       end
     end
   end

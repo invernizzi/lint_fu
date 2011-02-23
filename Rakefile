@@ -2,6 +2,8 @@ require 'rubygems'
 require 'rake'
 require 'spec/rake/spectask'
 require 'rake/rdoctask'
+require 'rake/gempackagetask'
+require 'rake/clean'
 
 desc "Run unit tests"
 task :default => :gem
@@ -15,10 +17,12 @@ Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
 
-desc "Build lint_fu gem"
-task :gem do
-   ruby 'lint_fu.gemspec'
-   pkg_dir = File.join(File.dirname(__FILE__), 'pkg')
-   FileUtils.mkdir_p(pkg_dir)
-   FileUtils.mv(Dir.glob(File.join(File.dirname(__FILE__), '*.gem')), pkg_dir)
+gemtask = Rake::GemPackageTask.new(Gem::Specification.load("lint_fu.gemspec")) do |package|
+  package.package_dir = ENV['PACKAGE_DIR'] || 'pkg'
+  package.need_zip = true
+  package.need_tar = true
 end
+
+directory gemtask.package_dir
+
+CLEAN.include(gemtask.package_dir)

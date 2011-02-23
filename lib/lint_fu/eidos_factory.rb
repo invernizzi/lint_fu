@@ -1,11 +1,11 @@
 module LintFu
-  class ModelElementBuilder < SexpProcessor
-    attr_reader   :namespace, :model_elements
+  class EidosFactory < SexpProcessor
+    attr_reader   :namespace, :eide
     attr_accessor :current_model_element
     
     def initialize(namespace=nil)
       super()
-      @model_elements = []
+      @eide = []
       @namespace = namespace || []
       self.require_empty   = false
       self.auto_shift_type = false      

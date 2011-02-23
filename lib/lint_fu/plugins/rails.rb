@@ -2,7 +2,7 @@ require 'lint_fu/plugins/action_pack'
 require 'lint_fu/plugins/active_record'
 
 require 'lint_fu/plugins/rails/model_application'
-require 'lint_fu/plugins/rails/model_application_builder'
+require 'lint_fu/plugins/rails/model_application_factory'
 require 'lint_fu/plugins/rails/buggy_eager_load_checker'
 require 'lint_fu/plugins/rails/sql_injection_checker'
 require 'lint_fu/plugins/rails/unsafe_find_checker'
@@ -19,7 +19,7 @@ module LintFu::Plugins
 
     def self.context_builder_for(dir)
       return nil unless applies_to?(dir)
-      ModelApplicationBuilder.new(dir)
+      ModelApplicationFactory.new(dir)
     end
 
     def self.issue_builder_for(dir)

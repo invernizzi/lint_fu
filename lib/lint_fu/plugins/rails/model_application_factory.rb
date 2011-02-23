@@ -1,10 +1,10 @@
 module LintFu::Plugins
   module Rails
-    class ModelApplicationBuilder < LintFu::ModelElementBuilder
+    class ModelApplicationFactory < LintFu::EidosFactory
       def initialize(fs_root)
         super
         @application = ModelApplication.new(fs_root)
-        self.model_elements << @application
+        self.eide << @application
       end
 
       def build
@@ -15,7 +15,7 @@ module LintFu::Plugins
           sexp = LintFu::Parser.parse_ruby(f)
           builder.process(sexp)
         end
-        builder.model_elements.each { |elem| @application.add_submodel(elem) }
+        builder.eide.each { |elem| @application.add_eidos(elem) }
 
         controllers_dir = File.join(@application.fs_root, 'app', 'controllers')
         builder = ActionPack::ModelControllerBuilder.new
@@ -24,7 +24,7 @@ module LintFu::Plugins
           sexp.file = f
           builder.process(sexp)
         end
-        builder.model_elements.each { |elem| @application.add_submodel(elem) }
+        builder.eide.each { |elem| @application.add_eidos(elem) }
       end
     end
   end

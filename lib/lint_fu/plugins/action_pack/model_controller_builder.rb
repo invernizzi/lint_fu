@@ -1,6 +1,6 @@
 module LintFu::Plugins
   module ActionPack
-    class ModelControllerBuilder < LintFu::ModelElementBuilder
+    class ModelControllerBuilder < LintFu::EidosFactory
       SIGNATURE_SEXP = s(:colon2, s(:const, :ActionController), :Base)
 
       #sexp:: [:class, <classname>, <superclass|nil>, <CLASS DEFS>]
@@ -15,7 +15,7 @@ module LintFu::Plugins
         ret = super(sexp)
 
         if did_element
-          self.model_elements.push self.current_model_element
+          self.eide.push self.current_model_element
           self.current_model_element = nil
         end
 
