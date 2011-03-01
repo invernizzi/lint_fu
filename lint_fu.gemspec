@@ -17,9 +17,11 @@ spec = Gem::Specification.new do |s|
   s.summary = %q{Security scanner that performs static analysis of Ruby code.}
   s.description = %q{This tool helps identify bugs in your code. It is Rails-centric but its modular design allows support for other application frameworks.}
 
+  s.add_runtime_dependency('trollop', [">= 1.16.0"])
   s.add_runtime_dependency('ruby_parser', ["~> 2.0"])
   s.add_runtime_dependency('ruby2ruby', ["~> 1.2"])
   s.add_runtime_dependency('activesupport', ["~> 2.3"])
+  s.add_runtime_dependency('builder', ["~> 2.1"])
   s.add_runtime_dependency('RedCloth', ["~> 4.2"])
 
   s.executables = ["lint_fu"]

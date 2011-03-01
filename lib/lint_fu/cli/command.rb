@@ -22,7 +22,8 @@ module LintFu::CLI
         STDOUT.flush
       end
     rescue Exception => e
-      puts 'error!' #ensure we print a newline
+      print 'error!' unless e.is_a?(SignalException)
+      puts
       raise e
     end
   end

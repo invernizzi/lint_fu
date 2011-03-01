@@ -1,23 +1,40 @@
 module LintFu
   module CLI
-    DEFAULT_COMMAND = 'scan'
+    BANNER = <<EOS
+Lint-fu finds security defects in Ruby code.
 
-    def self.run_command(argv)
-      #the command name is the first word of argv that doesn't
-      #begin with a hyphen or a (Windows-switch-style slash)
-      name = argv.detect { |w| w !~ %r(^[-/]) } || DEFAULT_COMMAND
-      sym = name.camelize.to_sym
+Usage:
+       lint_fu [options]
+where [options] are:
+EOS
+
+    def self.run
+      commands = []
+      ObjectSpace.each_object(Class) do |c|
+        commands << c.to_s.underscore if c.superclass == Command
+      end
+
+      global_opts = Trollop::options do
+        version "Lint-Fu #{Gem.loaded_specs['lint_fu'].version} (c) 2011 Tony Spataro"
+        banner BANNER
+        stop_on commands
+      end
+
+      cmd_name = ARGV.shift || 'scan'
+      sym = cmd_name.camelize.to_sym
 
       begin
         klass = const_get(sym)
         raise NameError unless klass.superclass == Command
       rescue NameError => e
-        raise NameError, "Unknown command #{name}"
+        Trollop::die "Unknown command #{cmd_name}"
       end
 
       cmd = klass.new
-      #TODO parse options and send them in
-      return cmd.run({})
+      return cmd.run(global_opts)
+    rescue Interrupt => e
+      puts "Interrupt; exiting without completing task."
+      exit(-1)
     end
   end
 end

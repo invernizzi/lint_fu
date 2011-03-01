@@ -4,10 +4,11 @@ require 'digest/md5'
 require 'digest/sha1'
 
 # Activate the various gems we depend on
-require 'active_support'
+require 'trollop'
 require 'ruby_parser'
 require 'sexp_processor'
 require 'ruby2ruby'
+require 'active_support'
 require 'builder'
 require 'redcloth'
 

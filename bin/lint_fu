@@ -5,4 +5,4 @@ $LOAD_PATH.unshift(basedir) unless $LOAD_PATH.include?(basedir)
 
 require 'lint_fu'
 
-exit( LintFu::CLI.run_command(ARGV) )
+exit( LintFu::CLI.run )
