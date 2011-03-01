@@ -1,7 +1,11 @@
 module LintFu::CLI
   # Base class for CLI commands
   class Command
-    def run(options)
+    def initialize(options)
+      @options = options
+    end
+
+    def run
       raise NotImplementedError
     end
 

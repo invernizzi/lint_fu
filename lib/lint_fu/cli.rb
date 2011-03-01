@@ -14,7 +14,7 @@ EOS
         commands << c.to_s.underscore if c.superclass == Command
       end
 
-      global_opts = Trollop::options do
+      opts = Trollop::options do
         version "Lint-Fu #{Gem.loaded_specs['lint_fu'].version} (c) 2011 Tony Spataro"
         banner BANNER
         stop_on commands
@@ -30,8 +30,8 @@ EOS
         Trollop::die "Unknown command #{cmd_name}"
       end
 
-      cmd = klass.new
-      return cmd.run(global_opts)
+      cmd = klass.new(opts)
+      return cmd.run
     rescue Interrupt => e
       puts "Interrupt; exiting without completing task."
       exit(-1)

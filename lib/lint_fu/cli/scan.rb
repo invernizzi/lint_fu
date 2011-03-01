@@ -1,6 +1,6 @@
 module LintFu::CLI
   class Scan < Command
-    def run(options)
+    def run
       app_root = File.expand_path('.')
       @scm = LintFu::SourceControlProvider.for_directory(app_root)
       raise LintFu::ProviderError.new("Unable to identify the source control provider for #{app_root}") unless @scm
