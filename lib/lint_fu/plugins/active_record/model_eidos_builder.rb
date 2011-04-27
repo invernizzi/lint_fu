@@ -1,6 +1,6 @@
 module LintFu::Plugins
   module ActiveRecord
-    class ModelModelBuilder < LintFu::EidosFactory
+    class ModelEidosBuilder < LintFu::EidosBuilder
       SIGNATURE_SEXP = s(:colon2, s(:const, :ActiveRecord), :Base)      
 
       SINGULAR_ASSOCS = Set.new([:belongs_to, :has_one])
@@ -12,7 +12,7 @@ module LintFu::Plugins
         return super(sexp) unless sexp[2] && sexp[2] == SIGNATURE_SEXP
 
         unless self.current_model_element
-          self.current_model_element = ModelModel.new(sexp, self.namespace)
+          self.current_model_element = ModelEidos.new(sexp, self.namespace)
           did_element = true
         end
 

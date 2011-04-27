@@ -10,11 +10,11 @@ module LintFu::Plugins
       end
 
       def controllers
-        eide.select { |m| m.kind_of?(LintFu::Plugins::ActionPack::ModelController) }
+        eide.select { |m| m.kind_of?(LintFu::Plugins::ActionPack::ControllerEidos) }
       end
 
       def models
-        eide.select { |m| m.kind_of?(LintFu::Plugins::ActiveRecord::ModelModel) }
+        eide.select { |m| m.kind_of?(LintFu::Plugins::ActiveRecord::ModelEidos) }
       end
     end
   end

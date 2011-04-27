@@ -1,5 +1,5 @@
 module LintFu
-  class EidosFactory < SexpProcessor
+  class EidosBuilder < SexpProcessor
     attr_reader   :namespace, :eide
     attr_accessor :current_model_element
     

@@ -7,7 +7,7 @@ spec = Gem::Specification.new do |s|
   s.required_ruby_version = Gem::Requirement.new(">= 1.8.7")
 
   s.name    = 'lint_fu'
-  s.version = '0.5.1'
+  s.version = '0.5.2'
   s.date    = '2011-02-19'
 
   s.authors = ['Tony Spataro']

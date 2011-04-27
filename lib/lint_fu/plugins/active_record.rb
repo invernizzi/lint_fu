@@ -1,2 +1,2 @@
-require 'lint_fu/plugins/active_record/model_model'
-require 'lint_fu/plugins/active_record/model_model_builder'
+require 'lint_fu/plugins/active_record/model_eidos'
+require 'lint_fu/plugins/active_record/model_eidos_builder'

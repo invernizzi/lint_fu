@@ -96,7 +96,7 @@ EOF
       end
 
       def finder?(type, call)
-        type.kind_of?(LintFu::Plugins::ActiveRecord::ModelModel) &&
+        type.kind_of?(LintFu::Plugins::ActiveRecord::ModelEidos) &&
                      ( call =~ FINDER_REGEXP || type.associations.has_key?(call) )
       end
 

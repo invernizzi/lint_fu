@@ -1,6 +1,6 @@
 module LintFu::Plugins
   module ActionPack
-    class ModelControllerBuilder < LintFu::EidosFactory
+    class ControllerEidosBuilder < LintFu::EidosBuilder
       SIGNATURE_SEXP = s(:colon2, s(:const, :ActionController), :Base)
 
       #sexp:: [:class, <classname>, <superclass|nil>, <CLASS DEFS>]
@@ -8,7 +8,7 @@ module LintFu::Plugins
         return super(sexp) unless sexp[2] && sexp[2] == SIGNATURE_SEXP
         
         unless self.current_model_element
-          self.current_model_element = ModelController.new(sexp, self.namespace)
+          self.current_model_element = ControllerEidos.new(sexp, self.namespace)
           did_element = true
         end
 

@@ -123,8 +123,12 @@ module LintFu
           min_line +=1 unless min_line == max_line
           return cont[min_line..max_line]
         else
-          return nil
+          return []
         end
+      end
+
+      def blessings
+        @blessings ||= Blessing.parse(self.preceding_comments)
       end
     end
   end

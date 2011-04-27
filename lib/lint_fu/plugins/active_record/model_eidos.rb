@@ -1,6 +1,6 @@
 module LintFu::Plugins
   module ActiveRecord
-    class ModelModel
+    class ModelEidos
       include LintFu::Eidos
       
       attr_reader :associations

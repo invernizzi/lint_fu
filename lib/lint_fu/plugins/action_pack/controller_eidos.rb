@@ -1,6 +1,6 @@
 module LintFu::Plugins
   module ActionPack
-    class ModelController
+    class ControllerEidos
       include LintFu::Eidos
     end
   end
