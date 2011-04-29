@@ -106,29 +106,43 @@ module LintFu
         return results
       end
 
-      def preceding_comments
-        cont = File.readlines(self.file)
+      def preceding_comment_range
+        unless @preceding_comment_range
+          cont = File.readlines(self.file)
 
-        comments = ''
+          comments = ''
 
-        max_line = self.line - 1 - 1
-        max_line = 0 if max_line < 0
-        min_line = max_line
+          max_line = self.line - 1 - 1
+          max_line = 0 if max_line < 0
+          min_line = max_line
 
-        while cont[min_line] =~ WHOLE_LINE_COMMENT && min_line >= 0
-          min_line -= 1
+          while cont[min_line] =~ WHOLE_LINE_COMMENT && min_line >= 0
+            min_line -= 1
+          end
+
+          if cont[max_line] =~ WHOLE_LINE_COMMENT
+            min_line +=1 unless min_line == max_line
+            @preceding_comment_range = FileRange.new(self.file, min_line+1, max_line+1, cont[min_line..max_line])
+          else
+            @preceding_comment_range = FileRange::NONE
+          end
         end
 
-        if cont[max_line] =~ WHOLE_LINE_COMMENT
-          min_line +=1 unless min_line == max_line
-          return cont[min_line..max_line]
+        if @preceding_comment_range == FileRange::NONE
+          return nil
         else
-          return []
+          return @preceding_comment_range
         end
+      end
+      
+      def preceding_comments
+        range = preceding_comment_range
+        return [] unless range
+        return range.content
       end
 
       def blessings
-        @blessings ||= Blessing.parse(self.preceding_comments)
+        @blessings ||= Blessing.parse(self.preceding_comments, self)
       end
     end
   end

@@ -1,21 +1,17 @@
 module LintFu::CLI
   class Scan < Command
     def run
-      app_root = File.expand_path('.')
-      @scm = LintFu::SourceControlProvider.for_directory(app_root)
-      raise LintFu::ProviderError.new("Unable to identify the source control provider for #{app_root}") unless @scm
-
       #Build a model of the application we are scanning.
       timed("Build a model of the application") do
-        builder = LintFu::Plugins::Rails.context_builder_for(app_root)
+        builder = LintFu::Plugins::Rails.context_builder_for(self.app_root)
         builder.build
         @application = builder.eide.first
       end
 
       #Using the model we built, scan the controllers for security bugs.
       timed("Scan the application") do
-        @scan = LintFu::Scan.new(app_root)
-        builder = LintFu::Plugins::Rails.issue_builder_for(app_root)
+        @scan = LintFu::Scan.new(self.app_root)
+        builder = LintFu::Plugins::Rails.issue_builder_for(self.app_root)
         builder.build(@application, @scan)
       end
 
@@ -26,7 +22,7 @@ module LintFu::CLI
       end
 
       #CruiseControl.rb integration: write our report to the CC build artifacts folder
-      output_dir = ENV['CC_BUILD_ARTIFACTS'] || app_root
+      output_dir = ENV['CC_BUILD_ARTIFACTS'] || self.app_root
       mkdir_p output_dir unless File.directory?(output_dir)
 
       flavor   = ENV['FORMAT'] || 'html'
@@ -47,7 +43,7 @@ module LintFu::CLI
       klass    = LintFu.const_get(typename.to_sym)
 
       timed("Generate report") do
-        klass.new(@scan, @scm, @genuine_issues).generate(output)
+        klass.new(@scan, self.scm, @genuine_issues).generate(output)
         output.close
       end
 

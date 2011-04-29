@@ -11,6 +11,16 @@ module LintFu::CLI
 
     protected
 
+    def app_root
+      File.expand_path('.')      
+    end
+
+    def scm
+      @scm ||= LintFu::SourceControlProvider.for_directory(app_root)
+      raise LintFu::ProviderError.new("Unable to identify the source control provider for #{app_root}") unless @scm
+      @scm
+    end
+
     def timed(activity)
       print activity, '...'
       STDOUT.flush

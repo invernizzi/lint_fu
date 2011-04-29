@@ -24,6 +24,11 @@ spec = Gem::Specification.new do |s|
   s.add_runtime_dependency('builder', ["~> 2.1"])
   s.add_runtime_dependency('RedCloth', ["~> 4.2"])
 
+  s.add_development_dependency('rake', [">= 0.8.7"])
+  s.add_development_dependency('ruby-debug', [">= 0.10.3"])
+  s.add_development_dependency('rspec', ["~> 1.3"])
+  s.add_development_dependency('flexmock', ["~> 0.8"])
+  
   s.executables = ["lint_fu"]
 
   candidates = ['lint_fu.gemspec', 'MIT-LICENSE', 'README.rdoc'] +

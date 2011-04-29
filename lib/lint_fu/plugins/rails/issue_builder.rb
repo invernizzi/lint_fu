@@ -27,6 +27,7 @@ module LintFu::Plugins
           sexp = LintFu::Parser.parse_ruby(filename)
           visitor = LintFu::Visitor.new
           visitor.observers << SqlInjectionChecker.new(scan, context, filename, 0.2)
+          visitor.observers << UnsafeFindChecker.new(scan, context, filename)
           visitor.process(sexp)          
         end
       end

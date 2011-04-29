@@ -57,19 +57,8 @@ EOF
     # updating or deleting someone else's records.
     class UnsafeFindChecker < LintFu::Checker
       FINDER_REGEXP  = /^(find|first|all)(_or_initialize)?(_by_.*_id)?/
-
-      #sexp:: s(:class, <class_name>, <superclass>, s(:scope, <class_definition>))
-      def observe_class_begin(sexp)
-        super(sexp)
-        #TODO get rid of RightScale-specific assumption
-        @in_admin_controller = !!(sexp[1].to_ruby_string =~ /^Admin/)
-      end
-
-      #sexp:: s(:class, <class_name>, <superclass>, s(:scope, <class_definition>))
-      def observe_class_end(sexp)
-        super(sexp)
-        @in_admin_controller = false
-      end
+      #TODO: make this tunable, also expose it to the user to make sure it's appropriate!!
+      SAFE_INSTANCE_METHODS = [:current_user, :current_account]
 
       #sexp:: s(:call, <target>, <method_name>, s(:arglist))
       def observe_call(sexp)
@@ -80,8 +69,6 @@ EOF
       protected
 
       def check_suspicious_finder(sexp)
-        return if @in_admin_controller
-
         #sexp:: :call, <target>, <method_name>, <argslist...>
         if (sexp[1] != nil) && (sexp[1][0] == :const || sexp[1][0] == :colon2)
           name = sexp[1].to_ruby_string
@@ -89,7 +76,7 @@ EOF
           call   = sexp[2].to_s
           params = sexp[3]
           if finder?(type, call) && !params.constant? &&
-             !sexp_contains_scope?(params) && !suppressed?(UnsafeFind)
+             !safely_scoped?(params) && !suppressed?(UnsafeFind)
             scan.issues << UnsafeFind.new(scan, self.file, sexp, params.to_ruby_string)
           end
         end        
@@ -100,22 +87,20 @@ EOF
                      ( call =~ FINDER_REGEXP || type.associations.has_key?(call) )
       end
 
-      def sexp_contains_scope?(sexp)
+      def safely_scoped?(sexp)
         return false if !sexp.kind_of?(Sexp) || sexp.empty?
+        return true if sexp.constant?
         
-        sexp_type = sexp[0]
-
-        #If calling a method -- check to see if we're accessing a current_* method
-        if (sexp_type == :call) && (sexp[1] == nil)
+        #Some local methods introduce safe scope
+        if (sexp[0] == :call)
           #TODO get rid of RightScale-specific assumptions
-          return true if (sexp[2] == :current_user)
-          return true if (sexp[2] == :current_account)
+          return true if sexp[1].nil? && SAFE_INSTANCE_METHODS.include?(sexp[2])
         end
 
         #Generic case: check all subexpressions of the sexp
         sexp.each do |subexp|
           if subexp.kind_of?(Sexp)
-            return true if sexp_contains_scope?(subexp)            
+            return true if safely_scoped?(subexp)
           end
         end
 

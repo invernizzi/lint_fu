@@ -16,7 +16,7 @@ h4. What is it?
 
 A buggy eager load happens when an ActiveRecord finder performs eager loading of a @:has_many@ association and the "target" of the association acts as paranoid.
 
-The acts_as_paranoid plugin does not correctly eager loads that use a @JOIN@ strategy. If a paranoid model is eager loaded in this way, _all_ models -- even deleted ones -- will be loaded.
+The acts_as_paranoid plugin does not correctly handle eager loads that use a @JOIN@ strategy. If a paranoid model is eager loaded in this way, _all_ models -- even deleted ones -- will be loaded.
 
 h4. When does it happen?
 

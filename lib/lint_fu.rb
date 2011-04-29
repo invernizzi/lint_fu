@@ -16,6 +16,7 @@ require 'redcloth'
 require 'lint_fu/mixins'
 
 # Core lint-fu sources
+require 'lint_fu/file_range'
 require 'lint_fu/parser'
 require 'lint_fu/eidos'
 require 'lint_fu/eidos_container'
