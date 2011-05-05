@@ -4,6 +4,15 @@ module LintFu::CLI
       #Build a model of the application we are scanning.
       timed("Build a model of the application") do
         builder = LintFu::Plugins::Rails.context_builder_for(self.app_root)
+
+        unless builder
+          say "Cannot determine context builder for #{File.basename(self.app_root)}."
+          say "Either this application uses a framework that is unsupported by LintFu,"
+          say "or a bug is preventing us from recognizing the application framework."
+          say "Sorry!"
+          exit(-1)
+        end
+
         builder.build
         @application = builder.eide.first
       end
@@ -11,13 +20,14 @@ module LintFu::CLI
       #Using the model we built, scan the controllers for security bugs.
       timed("Scan the application") do
         @scan = LintFu::Scan.new(self.app_root)
+        #TODO generalize/abstract this, same as we did for context builders
         builder = LintFu::Plugins::Rails.issue_builder_for(self.app_root)
         builder.build(@application, @scan)
       end
 
       @genuine_issues = @scan.issues.select { |i| !@scan.blessed?(i) }
       if @genuine_issues.empty?
-        puts "Clean scan: no issues found. Skipping report."
+        say "Clean scan: no issues found. Skipping report."
         exit(0)
       end
 
@@ -36,7 +46,7 @@ module LintFu::CLI
         when 'text'
           output = STDOUT
         else
-          puts "Unrecognized output format #{flavor} (undefined type #{typename})"
+          say "Unrecognized output format #{flavor} (undefined type #{typename})"
           exit -1
       end
 

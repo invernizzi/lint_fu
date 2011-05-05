@@ -13,6 +13,7 @@ module LintFu::CLI
       #Using the model we built, scan the controllers for security bugs.
       timed("Scan the application") do
         @scan = LintFu::Scan.new(self.app_root)
+        #TODO generalize/abstract this, same as we did for context builders
         builder = LintFu::Plugins::Rails.issue_builder_for(self.app_root)
         builder.build(@application, @scan)
       end
@@ -41,14 +42,14 @@ module LintFu::CLI
         end
       end
 
-      puts "Found #{useless.size} extraneous annotations (out of #{blessings.size} total)."
+      say "Found #{useless.size} extraneous annotations (out of #{blessings.size} total)."
 
       useless.each do |range|
         filename = File.relative_path(self.app_root, range.filename)
-        puts "#{filename}:#{range.line}"
+        say "#{filename}:#{range.line}"
       end
 
-      puts "WARNING: I did not actually prune these; you need to do it yourself!!"
+      say "WARNING: I did not actually prune these; you need to do it yourself!!"
 
       return 0
     end

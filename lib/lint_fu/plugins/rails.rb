@@ -13,8 +13,7 @@ module LintFu::Plugins
     def self.applies_to?(dir)
       File.exist?(File.join(dir, 'app')) &&
       File.exist?(File.join(dir, 'config', 'environments')) &&
-      File.exist?(File.join(dir, 'config', 'environment.rb')) &&
-      File.exist?(File.join(dir, 'config', 'database.yml'))
+      File.exist?(File.join(dir, 'config', 'environment.rb'))
     end
 
     def self.context_builder_for(dir)

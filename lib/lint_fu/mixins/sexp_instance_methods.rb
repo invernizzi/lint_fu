@@ -1,4 +1,8 @@
 module LintFu
+  class TranslationFailure < Exception
+
+  end
+
   module Mixins
     module SexpInstanceMethods
       WHOLE_LINE_COMMENT = /^\s*#/
@@ -51,7 +55,7 @@ module LintFu
             return result
           else
             return options[:partial] if options.has_key?(:partial)
-            raise StandardError.new("Cannot convert Sexp to Ruby object: " + self.to_s)
+            raise TranslationFailure.new("Cannot convert Sexp to Ruby object (expression at #{self.file}:#{self.line}): " + self.to_s)
         end
       end
 

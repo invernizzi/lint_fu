@@ -21,6 +21,10 @@ module LintFu::CLI
       @scm
     end
 
+    def say(*args)
+      LintFu::CLI.say(*args)
+    end
+
     def timed(activity)
       print activity, '...'
       STDOUT.flush

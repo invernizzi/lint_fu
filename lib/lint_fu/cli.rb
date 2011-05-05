@@ -33,8 +33,11 @@ EOS
       cmd = klass.new(opts)
       return cmd.run
     rescue Interrupt => e
-      puts "Interrupt; exiting without completing task."
+      say "Interrupt; exiting without completing task."
       exit(-1)
+    end
+    def self.say(*args)
+      puts(*args)
     end
   end
 end

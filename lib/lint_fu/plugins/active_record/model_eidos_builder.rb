@@ -53,6 +53,8 @@ module LintFu::Plugins
 
           self.current_model_element.associations[assoc_name] = assoc_class_name
         end        
+      rescue LintFu::TranslationFailure => e
+        # TODO: log a warning
       end
 
       def discover_named_scopes(callee, method, arglist)
@@ -62,6 +64,8 @@ module LintFu::Plugins
           scope_args = arglist[2..-1].to_ruby(:partial=>nil)
           self.current_model_element.named_scopes[scope_name] = scope_args
         end
+      rescue LintFu::TranslationFailure => e
+        # TODO: log a warning
       end
 
       def discover_paranoia(callee, method, arglist)
