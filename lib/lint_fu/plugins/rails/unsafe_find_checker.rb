@@ -79,7 +79,7 @@ EOF
              !safely_scoped?(params) && !suppressed?(UnsafeFind)
             scan.issues << UnsafeFind.new(scan, self.file, sexp, params.to_ruby_string)
           end
-        end        
+        end
       end
 
       def finder?(type, call)
@@ -97,11 +97,9 @@ EOF
           return true if sexp[1].nil? && SAFE_INSTANCE_METHODS.include?(sexp[2])
         end
 
-        #Generic case: check all subexpressions of the sexp
+        #Generic case: check that all subexpressions of the sexp are safely scoped
         sexp.each do |subexp|
-          if subexp.kind_of?(Sexp)
-            return true if safely_scoped?(subexp)
-          end
+          return false if subexp.kind_of?(Sexp) && !safely_scoped?(subexp)
         end
 
         return false
