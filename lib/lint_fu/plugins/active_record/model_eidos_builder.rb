@@ -9,7 +9,9 @@ module LintFu::Plugins
 
       #sexp:: [:class, <classname>, <superclass|nil>, <CLASS DEFS>]
       def process_class(sexp)
-        return super(sexp) unless sexp[2] && sexp[2] == SIGNATURE_SEXP
+        #always assume everything we see is a model
+        #cheap way to deal with model class hierarchy!
+        #return super(sexp) unless sexp[2] && sexp[2] == SIGNATURE_SEXP
 
         unless self.current_model_element
           self.current_model_element = ModelEidos.new(sexp, self.namespace)
