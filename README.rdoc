@@ -14,7 +14,9 @@ will sometimes report false positives.
 
 = Example
 
-$ rake lint
+$ gem install lint_fu
+$ cd ~/my_project
+$ lint_fu
 
 
-Copyright (c) 2009 Tony Spataro, released under the MIT license
+Copyright (c) 2009-2011 Tony Spataro, released under the MIT license
