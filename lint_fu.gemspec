@@ -7,7 +7,7 @@ spec = Gem::Specification.new do |s|
   s.required_ruby_version = Gem::Requirement.new(">= 1.8.7")
 
   s.name    = 'lint_fu'
-  s.version = '0.5.3'
+  s.version = '0.5.4'
   s.date    = '2011-02-19'
 
   s.authors = ['Tony Spataro']
@@ -20,7 +20,8 @@ spec = Gem::Specification.new do |s|
   s.add_runtime_dependency('trollop', [">= 1.16.0"])
   s.add_runtime_dependency('ruby_parser', ["~> 2.0"])
   s.add_runtime_dependency('ruby2ruby', ["~> 1.2"])
-  s.add_runtime_dependency('activesupport', ["~> 2.3"])
+  s.add_runtime_dependency('activesupport', [">= 2.3"])
+  s.add_runtime_dependency('i18n', [">= 0.6.0"])
   s.add_runtime_dependency('builder', ["~> 2.1"])
   s.add_runtime_dependency('RedCloth', ["~> 4.2"])
 

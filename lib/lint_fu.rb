@@ -9,6 +9,7 @@ require 'ruby_parser'
 require 'sexp_processor'
 require 'ruby2ruby'
 require 'active_support'
+require 'active_support/core_ext/string/inflections'
 require 'builder'
 require 'redcloth'
 
