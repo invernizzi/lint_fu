@@ -4,6 +4,7 @@ require 'spec/rake/spectask'
 require 'rake/rdoctask'
 require 'rake/gempackagetask'
 require 'rake/clean'
+require 'cucumber/rake/task'
 
 task :default => :spec
 
@@ -13,6 +14,13 @@ Spec::Rake::SpecTask.new do |t|
   t.spec_opts = lambda do
     IO.readlines(File.join(File.dirname(__FILE__), 'spec', 'spec.opts')).map {|l| l.chomp.split " "}.flatten
   end
+end
+
+desc "Run functional tests"
+Cucumber::Rake::Task.new do |t|
+  options = %w{--color --format pretty}
+  options << '--verbose' if ENV['VERBOSE'] || ENV['DEBUG']
+  t.cucumber_opts = options
 end
 
 desc 'Generate documentation for the lint_fu plugin.'
