@@ -1,20 +1,25 @@
 require 'tempfile'
 
 Given /^a Rails app$/ do
-  @original_pwd = Dir.pwd
-  @rails_root = Dir.mktmpdir('lint_fu')
-
-  runshell("rails new #{@rails_root} -q")
-  Dir.chdir(@rails_root)
-
-  runshell('git init')
-  runshell('git add .')
-  runshell('git commit -q -m "Initial commit"')
+  if $app_root && File.directory?($app_root)
+    Dir.chdir($app_root) do
+      runshell('git reset --hard initial')
+    end
+  else
+    $app_root ||= Dir.mktmpdir('lint_fu')
+    runshell("rails new #{$app_root} -q")
+    Dir.chdir($app_root) do
+      runshell('git init')
+      runshell('git add .')
+      runshell('git commit -q -m "Initial commit"')
+      runshell('git tag initial')
+    end
+  end
 end
 
 Given /^a ([A-Z][\w:]+) model$/ do |klass_name|
   base_klass = 'ActiveRecord::Base'
-  path = File.join(@rails_root, 'app', 'models', klass_name.underscore + '.rb')
+  path = File.join($app_root, 'app', 'models', klass_name.underscore + '.rb')
   file = File.open(path, 'w')
   file.write <<EOS
 class #{klass_name} < #{base_klass}
@@ -26,7 +31,7 @@ end
 Given /^a ([A-Z][\w:]+) model defined by$/ do |klass_name, body|
   base_klass = 'ActiveRecord::Base'
   body = body.split("\n").map { |l| '  ' + l}
-  path = File.join(@rails_root, 'app', 'models', klass_name.underscore + '.rb')
+  path = File.join($app_root, 'app', 'models', klass_name.underscore + '.rb')
   file = File.open(path, 'w')
   file.write <<EOS
 class #{klass_name} < #{base_klass}
@@ -49,7 +54,7 @@ Given /^a ([A-Z][\w:]+) controller defined by$/ do |klass_name, body|
   #indentation for pretty printing (oooh!)
   body = body.map { |l| '  ' + l}
 
-  path = File.join(@rails_root, 'app', 'controllers', klass_name.underscore + '.rb')
+  path = File.join($app_root, 'app', 'controllers', klass_name.underscore + '.rb')
   file = File.open(path, 'w')
   file.write <<EOS
 class #{klass_name} < ApplicationController
@@ -68,11 +73,4 @@ Given /^a simple Rails app$/ do
     belongs_to :company
     named_scope :verified, :conditions=>'verified_at IS NOT NULL'
   EOS
-end
-
-After do
-  Dir.chdir(@original_pwd) if @original_pwd
-  if @rails_root && File.directory?(@rails_root)
-    FileUtils.rm_rf(@rails_root)
-  end
 end

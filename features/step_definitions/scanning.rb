@@ -1,9 +1,5 @@
 When /I run a scan/ do
-  unless @rails_root && File.directory?(@rails_root)
-    raise ArgumentError, "Cannot run scans without @app_root; did you invoke a suitable Given?"
-  end
-
-  Dir.chdir(@rails_root) do
+  Dir.chdir($app_root) do
     output_file = Tempfile.new('lint_fu') ; output_file.close
     output_file = output_file.path
 
