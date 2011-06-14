@@ -1,6 +1,6 @@
 module LintFu
   module SourceControl
-    class Git < SourceControlProvider
+    class Git < BaseProvider
       BLAME_REGEXP = /^(.*) \((.+) [0-9]{4}-[0-9]{1,2}-[0-9]{1,2}\s+([0-9]+)\)/
 
       def initialize(path)

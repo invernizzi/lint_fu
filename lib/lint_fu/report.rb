@@ -10,7 +10,7 @@ module LintFu
     end
 
     def generate(output_stream)
-      raise NotImplemented
+      raise NotImplementedError
     end
   end
 
@@ -234,6 +234,12 @@ module LintFu
         output_stream.puts
         counter += 1
       end
+    end
+  end
+
+  class MarshalReport < Report
+    def generate(output_stream)
+      output_stream.write(Marshal.dump(@scan))
     end
   end
 end

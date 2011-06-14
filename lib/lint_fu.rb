@@ -22,16 +22,13 @@ require 'lint_fu/parser'
 require 'lint_fu/eidos'
 require 'lint_fu/eidos_container'
 require 'lint_fu/eidos_builder'
-require 'lint_fu/source_control_provider'
+require 'lint_fu/source_control'
 require 'lint_fu/issue'
 require 'lint_fu/blessing'
 require 'lint_fu/checker'
 require 'lint_fu/visitor'
 require 'lint_fu/scan'
 require 'lint_fu/report'
-
-# source control providers
-require 'lint_fu/source_control/git'
 
 # plugins
 require 'lint_fu/plugins'

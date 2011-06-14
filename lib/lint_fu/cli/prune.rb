@@ -1,5 +1,5 @@
 module LintFu::CLI
-  class Prune < Command
+  class Prune < BaseCommand
     RUBY_FILE_EXT = /\.rb[a-z]?/
 
     def run

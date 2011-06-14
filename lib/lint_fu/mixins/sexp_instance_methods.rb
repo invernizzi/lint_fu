@@ -67,9 +67,7 @@ module LintFu
             return true
           when :array, :arglist
             contents = self[1..-1]
-            return false if contents.empty?
-            contents.each { |sexp| return false unless sexp.constant? }
-            return true
+            return contents.all? { |sexp| sexp.constant? }
           when :hash
             result = {}
             key, value = nil, nil

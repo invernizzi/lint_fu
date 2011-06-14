@@ -1,5 +1,27 @@
+require 'pathname'
+
 module LintFu::CLI
-  class Scan < Command
+  class Scan < BaseCommand
+    REPORT_FORMATS = {
+        'html'    => LintFu::HtmlReport,
+        'text'    => LintFu::TextReport,
+        'marshal' => LintFu::MarshalReport
+    }
+
+    # The marshal format is not portable; it's only used for functional tests
+    VISIBLE_FORMATS = REPORT_FORMATS.keys - ['marshal']
+
+    def initialize(options)
+      #Special-case options handling: if neither report nor output was supplied, assume the
+      #user wants an HTML report output to lint_fu.html in the current directory.
+      unless options[:format] || options[:output]
+        options[:format] ||= 'html'
+        options[:output] = 'lint_fu.html'
+      end
+
+      super(options)
+    end
+
     def run
       #Build a model of the application we are scanning.
       timed("Build a model of the application") do
@@ -25,52 +47,40 @@ module LintFu::CLI
         builder.build(@application, @scan)
       end
 
-      @genuine_issues = @scan.issues.select { |i| !@scan.blessed?(i) }
-      if @genuine_issues.empty?
-        say "Clean scan: no issues found. Skipping report."
-        exit(0)
+      report_klass = REPORT_FORMATS[@options[:format]]
+      output_name = Pathname.new(@options[:output]) if @options[:output]
+
+      if output_name && !output_name.absolute?
+        # Magic CCRb integration
+        # TODO: remove magic, it's not needed!
+        output_dir = Pathname.new(ENV['CC_BUILD_ARTIFACTS'] || self.app_root)
+        output_name = output_dir + output_name
       end
 
-      #CruiseControl.rb integration: write our report to the CC build artifacts folder
-      output_dir = ENV['CC_BUILD_ARTIFACTS'] || self.app_root
-      mkdir_p output_dir unless File.directory?(output_dir)
-
-      flavor   = ENV['FORMAT'] || 'html'
-      typename = "#{flavor}_report".camelize
-
-      #Use a filename (or STDOUT) for our report that corresponds to its format
-      case flavor
-        when 'html'
-          output_name = File.join(output_dir, 'lint.html')
-          output      = File.open(output_name, 'w')
-        when 'text'
-          output = STDOUT
-        else
-          say "Unrecognized output format #{flavor} (undefined type #{typename})"
-          exit -1
+      if output_name
+        output_dir = output_name.dirname
+        FileUtils.mkdir_p output_dir unless File.directory?(output_dir)
+        output = File.open(output_name, 'w')
+      else
+        output = STDOUT
       end
-
-      klass    = LintFu.const_get(typename.to_sym)
 
       timed("Generate report") do
-        klass.new(@scan, self.scm, @genuine_issues).generate(output)
+        @genuine_issues = @scan.issues.select { |i| !@scan.blessed?(i) }
+        report_klass.new(@scan, self.scm, @genuine_issues).generate(output)
         output.close
       end
 
       #Support automation jobs that need to distinguish between failure due to
       #broken environment and failure to due issues that were genuinely found by
       #the lint task.
-      if ENV['STATUS_IF_ISSUES']
-        if(@genuine_issues.size > 0)
-          retval = ENV['STATUS_IF_ISSUES'].to_i
-        else
-          retval = 0
-        end
-      else
+      if (@genuine_issues.size > 0) && @options[:fail]
         retval = [@genuine_issues.size, 255].min
+      else
+        retval = 0
       end
 
-      system("open #{output_name}") if (output != STDOUT && STDOUT.tty?)
+      system("open #{output_name}") if (output != STDOUT) && STDOUT.tty?
 
       return retval
     end

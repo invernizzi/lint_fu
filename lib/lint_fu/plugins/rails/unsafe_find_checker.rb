@@ -70,39 +70,55 @@ EOF
 
       def check_suspicious_finder(sexp)
         #sexp:: :call, <target>, <method_name>, <argslist...>
-        if (sexp[1] != nil) && (sexp[1][0] == :const || sexp[1][0] == :colon2)
-          name = sexp[1].to_ruby_string
-          type = self.context.models.detect { |m| m.modeled_class_name == name }
-          call   = sexp[2].to_s
-          params = sexp[3]
-          if finder?(type, call) && !params.constant? &&
-             !safely_scoped?(params) && !suppressed?(UnsafeFind)
-            scan.issues << UnsafeFind.new(scan, self.file, sexp, params.to_ruby_string)
-          end
+        target = sexp[1]
+        method = sexp[2]
+        params = sexp[3]
+        return unless target
+
+        if finder?(target, method) && !safely_scoped?(params) && !suppressed?(UnsafeFind)
+          scan.issues << UnsafeFind.new(scan, self.file, sexp, params.to_ruby_string)
         end
       end
 
-      def finder?(type, call)
-        type.kind_of?(LintFu::Plugins::ActiveRecord::ModelEidos) &&
-                     ( call =~ FINDER_REGEXP || type.associations.has_key?(call) )
+      def finder?(target, method)
+        return false unless target && method
+
+        if target[0] == :const || target[0] == :colon2
+          #Calls to a class method
+          target_class = target.to_ruby_string
+          type   = self.context.models.detect { |m| m.modeled_class_name == target_class }
+          return type.kind_of?(LintFu::Plugins::ActiveRecord::ModelEidos) &&
+                 ( method.to_s =~ FINDER_REGEXP || type.named_scopes.has_key?(method.to_sym) )
+        elsif target[0] == :call
+          target_target = target[1]
+          target_method = target[2]
+          return finder?(target_target, target_method)
+        end
       end
 
       def safely_scoped?(sexp)
-        return false if !sexp.kind_of?(Sexp) || sexp.empty?
+        return false unless sexp.kind_of?(Sexp) && !sexp.empty?
         return true if sexp.constant?
-        
-        #Some local methods introduce safe scope
-        if (sexp[0] == :call)
+
+        kw   = sexp[0]
+        body = sexp[1..-1]
+
+        if (kw == :call)
+          #Some local method calls introduce safe scope
           #TODO get rid of RightScale-specific assumptions
-          return true if sexp[1].nil? && SAFE_INSTANCE_METHODS.include?(sexp[2])
-        end
+          target = sexp[1]
+          method = sexp[2]
+          return true if target.nil? && SAFE_INSTANCE_METHODS.include?(method)
 
-        #Generic case: check that all subexpressions of the sexp are safely scoped
-        sexp.each do |subexp|
-          return false if subexp.kind_of?(Sexp) && !safely_scoped?(subexp)
+          #If every parameter is safely scoped, a method call is also thus
+          body.each do |sub|
+            return false unless sub.kind_of?(Sexp) && safely_scoped?(sub)
+          end
+          return true
+        else
+          #Generic case: all subexpressions must be safely scoped
+          return body.any? { |sub| !sub.kind_of?(Sexp) || safely_scoped?(sub) }
         end
-
-        return false
       end
     end
   end

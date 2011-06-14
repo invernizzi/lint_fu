@@ -7,8 +7,8 @@ spec = Gem::Specification.new do |s|
   s.required_ruby_version = Gem::Requirement.new(">= 1.8.7")
 
   s.name    = 'lint_fu'
-  s.version = '0.5.4'
-  s.date    = '2011-02-19'
+  s.version = '0.6.0'
+  s.date    = '2011-06-14'
 
   s.authors = ['Tony Spataro']
   s.email   = 'code@tracker.xeger.net'
@@ -29,7 +29,9 @@ spec = Gem::Specification.new do |s|
   s.add_development_dependency('ruby-debug', [">= 0.10.3"])
   s.add_development_dependency('rspec', ["~> 1.3"])
   s.add_development_dependency('flexmock', ["~> 0.8"])
-  
+  s.add_development_dependency('cucumber', ["~> 0.8"])
+  s.add_development_dependency('rails', ["~> 3.0"])
+
   s.executables = ["lint_fu"]
 
   candidates = ['lint_fu.gemspec', 'MIT-LICENSE', 'README.rdoc'] +
