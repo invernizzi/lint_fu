@@ -1,6 +1,6 @@
 module LintFu::Plugins
   module Rails
-    class ApplicationEidosBuilder < LintFu::EidosBuilder
+    class ApplicationEidosBuilder < LintFu::Core::EidosBuilder
       def initialize(fs_root)
         super
         @application = ApplicationEidos.new(fs_root)

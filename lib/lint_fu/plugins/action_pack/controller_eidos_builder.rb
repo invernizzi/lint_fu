@@ -1,6 +1,6 @@
 module LintFu::Plugins
   module ActionPack
-    class ControllerEidosBuilder < LintFu::EidosBuilder
+    class ControllerEidosBuilder < LintFu::Core::EidosBuilder
       SIGNATURE_SEXP = s(:colon2, s(:const, :ActionController), :Base)
 
       #sexp:: [:class, <classname>, <superclass|nil>, <CLASS DEFS>]

@@ -2,7 +2,7 @@ module LintFu
   module SourceControl
     class ProviderError < Exception
       def initialize(*args)
-        if args.length == 2 && args[0].kind_of?(LintFu::SourceControlProvider)
+        if args.length == 2 && args[0].kind_of?(LintFu::SourceControl::BaseProvider)
           provider = args[0]
           path     = args[1]
           super("The #{provider.class.name} source control provider does not recognize #{path} as a valid repository")
@@ -33,7 +33,7 @@ end
 require 'lint_fu/source_control/base_provider'
 
 # Everyone else can be loaded automagically
-cli_dir = File.expand_path('../source_control', __FILE__)
-Dir[File.join(cli_dir, '*.rb')].each do |file|
+sc_dir = File.expand_path('../source_control', __FILE__)
+Dir[File.join(sc_dir, '*.rb')].each do |file|
   require file
 end

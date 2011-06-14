@@ -126,13 +126,13 @@ module LintFu
 
           if cont[max_line] =~ WHOLE_LINE_COMMENT
             min_line +=1 unless min_line == max_line
-            @preceding_comment_range = FileRange.new(self.file, min_line+1, max_line+1, cont[min_line..max_line])
+            @preceding_comment_range = LintFu::Core::FileRange.new(self.file, min_line+1, max_line+1, cont[min_line..max_line])
           else
-            @preceding_comment_range = FileRange::NONE
+            @preceding_comment_range = LintFu::Core::FileRange::NONE
           end
         end
 
-        if @preceding_comment_range == FileRange::NONE
+        if @preceding_comment_range == LintFu::Core::FileRange::NONE
           return nil
         else
           return @preceding_comment_range
@@ -146,7 +146,7 @@ module LintFu
       end
 
       def blessings
-        @blessings ||= Blessing.parse(self.preceding_comments, self)
+        @blessings ||= LintFu::Core::Blessing.parse(self.preceding_comments, self)
       end
     end
   end

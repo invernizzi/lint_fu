@@ -3,7 +3,7 @@ module LintFu::Plugins
     class ApplicationEidos
       attr_reader :fs_root
       
-      include LintFu::EidosContainer
+      include LintFu::Core::EidosContainer
 
       def initialize(fs_root)
         @fs_root = fs_root

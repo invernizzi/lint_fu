@@ -3,9 +3,9 @@ require 'pathname'
 module LintFu::CLI
   class Scan < BaseCommand
     REPORT_FORMATS = {
-        'html'    => LintFu::HtmlReport,
-        'text'    => LintFu::TextReport,
-        'marshal' => LintFu::MarshalReport
+        'html'    => LintFu::Reports::HtmlWriter,
+        'text'    => LintFu::Reports::TextWriter,
+        'marshal' => LintFu::Reports::MarshalWriter
     }
 
     # The marshal format is not portable; it's only used for functional tests
@@ -41,7 +41,7 @@ module LintFu::CLI
 
       #Using the model we built, scan the controllers for security bugs.
       timed("Scan the application") do
-        @scan = LintFu::Scan.new(self.app_root)
+        @scan = LintFu::Core::Scan.new(self.app_root)
         #TODO generalize/abstract this, same as we did for context builders
         builder = LintFu::Plugins::Rails.issue_builder_for(self.app_root)
         builder.build(@application, @scan)

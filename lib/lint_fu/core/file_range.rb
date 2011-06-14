@@ -1,4 +1,4 @@
-module LintFu
+module LintFu::Core
   class FileRange
     attr_reader :filename, :min_line, :max_line
 

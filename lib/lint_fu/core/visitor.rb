@@ -1,4 +1,4 @@
-module LintFu
+module LintFu::Core
   class Visitor < SexpProcessor
     attr_reader :observers
     

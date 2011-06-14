@@ -1,4 +1,4 @@
-module LintFu
+module LintFu::Core
   # An eidos (plural: eide) holds information about a Ruby class, module or other
   # relevant piece of code. The name comes from Plato's theory of forms; the
   # eidos is the universal abstraction of an entire class of objects.

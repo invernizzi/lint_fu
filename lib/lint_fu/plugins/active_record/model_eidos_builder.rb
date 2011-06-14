@@ -1,6 +1,6 @@
 module LintFu::Plugins
   module ActiveRecord
-    class ModelEidosBuilder < LintFu::EidosBuilder
+    class ModelEidosBuilder < LintFu::Core::EidosBuilder
       SIGNATURE_SEXP = s(:colon2, s(:const, :ActiveRecord), :Base)      
 
       SINGULAR_ASSOCS = Set.new([:belongs_to, :has_one])

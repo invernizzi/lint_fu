@@ -15,7 +15,7 @@ module LintFu::Plugins
         #Scan controllers
         Dir.glob(File.join(controllers_dir, '**', '*.rb')).each do |filename|
           sexp = LintFu::Parser.parse_ruby(filename)
-          visitor = LintFu::Visitor.new
+          visitor = LintFu::Core::Visitor.new
           visitor.observers << BuggyEagerLoadChecker.new(scan, context, filename)
           visitor.observers << SqlInjectionChecker.new(scan, context, filename)
           visitor.observers << UnsafeFindChecker.new(scan, context, filename)
@@ -25,7 +25,7 @@ module LintFu::Plugins
         #Scan models
         Dir.glob(File.join(models_dir, '**', '*.rb')).each do |filename|
           sexp = LintFu::Parser.parse_ruby(filename)
-          visitor = LintFu::Visitor.new
+          visitor = LintFu::Core::Visitor.new
           visitor.observers << SqlInjectionChecker.new(scan, context, filename, 0.2)
           visitor.observers << UnsafeFindChecker.new(scan, context, filename)
           visitor.process(sexp)          

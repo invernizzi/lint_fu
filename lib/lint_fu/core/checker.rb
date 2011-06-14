@@ -1,4 +1,4 @@
-module LintFu
+module LintFu::Core
   class Checker
     SUPPRESSION_COMMENT = /#\s*lint\s*[-:]\s*(suppress|ignore) (.*)/i
 

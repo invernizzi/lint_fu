@@ -1,4 +1,4 @@
-module LintFu
+module LintFu::Core
   # An element of a static analysis model that contains, or consists of, eide. For instance,
   # an Application might consists of Models, Controllers and Views.
   module EidosContainer

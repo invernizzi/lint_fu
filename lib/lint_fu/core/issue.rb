@@ -1,4 +1,4 @@
-module LintFu
+module LintFu::Core
   class Issue
     attr_reader :file, :sexp, :confidence
     

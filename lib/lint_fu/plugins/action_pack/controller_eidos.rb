@@ -1,7 +1,7 @@
 module LintFu::Plugins
   module ActionPack
     class ControllerEidos
-      include LintFu::Eidos
+      include LintFu::Core::Eidos
     end
   end
 end

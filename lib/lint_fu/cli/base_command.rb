@@ -28,7 +28,7 @@ module LintFu::CLI
 
     def scm
       @scm ||= LintFu::SourceControl.for_directory(app_root)
-      raise LintFu::ProviderError.new("Unable to identify the source control provider for #{app_root}") unless @scm
+      raise LintFu::SourceControl::ProviderError.new("Unable to identify the source control provider for #{app_root}") unless @scm
       @scm
     end
 

@@ -1,4 +1,4 @@
-module LintFu
+module LintFu::Core
   class ScanNotFinalized < Exception; end
   
   class Scan

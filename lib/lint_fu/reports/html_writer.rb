@@ -1,20 +1,5 @@
-
-module LintFu
-  class Report
-    attr_reader :scan, :scm
-    
-    def initialize(scan, scm, included_issues)
-      @scan   = scan
-      @scm    = scm
-      @issues = included_issues
-    end
-
-    def generate(output_stream)
-      raise NotImplementedError
-    end
-  end
-
-  class HtmlReport < Report
+module LintFu::Reports
+  class HtmlWriter < BaseWriter
     STYLESHEET = <<-EOF
       table { border: 2px solid black }
       th    { color: white; background: black }
@@ -176,7 +161,7 @@ module LintFu
             sample_issue = array.first
             body.h2 sample_issue.brief
             body.div(:id=>id_for_issue_class(sample_issue.class)) do |div|
-              div << RedCloth.new(sample_issue.reference_info).to_html 
+              div << RedCloth.new(sample_issue.reference_info).to_html
             end
           end
 
@@ -189,7 +174,7 @@ module LintFu
 
     def reference_link(parent, issue)
       href = "#TB_inline?width=800&height=600&inlineId=#{id_for_issue_class(issue.class)}"
-      parent.a(issue.brief, :href=>href.to_sym, :title=>issue.brief, :class=>'thickbox')      
+      parent.a(issue.brief, :href=>href.to_sym, :title=>issue.brief, :class=>'thickbox')
     end
 
     def highlighted_code_snippet(parent, snippet, first_line, highlight)
@@ -199,7 +184,7 @@ module LintFu
     def include_external_javascripts(head)
       #Note that we pass an empty block {} to the script tag in order to make
       #Builder create a beginning-and-end tag; most browsers won't parse
-      #"empty" script tags even if they point to a src!!!      
+      #"empty" script tags even if they point to a src!!!
       head.script(:src=>'http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js', :type=>'text/javascript') {}
       head.script(:src=>'https://s3.amazonaws.com/lint_fu/assets/js/thickbox.min.js', :type=>'text/javascript') {}
       head.script(:src=>'https://s3.amazonaws.com/lint_fu/assets/js/xregexp.min.js', :type=>'text/javascript') {}
@@ -214,32 +199,11 @@ module LintFu
     end
 
     def id_for_issue_class(klass)
-      "reference_#{klass.name.split('::')[-1].underscore}"      
+      "reference_#{klass.name.split('::')[-1].underscore}"
     end
 
     def activate_syntax_highlighter(body)
       body.script('SyntaxHighlighter.all()', :type=>'text/javascript')
-    end
-  end
-
-  class TextReport < Report
-    def generate(output_stream)
-      counter = 1
-
-      @issues.each do |issue|
-        #commit, author = scm.blame(issue.relative_file, issue.line)
-        output_stream.puts " #{counter}) Failure:"
-        output_stream.puts "#{issue.brief}, #{issue.relative_file}:#{issue.line}"
-        output_stream.puts
-        output_stream.puts
-        counter += 1
-      end
-    end
-  end
-
-  class MarshalReport < Report
-    def generate(output_stream)
-      output_stream.write(Marshal.dump(@scan))
     end
   end
 end

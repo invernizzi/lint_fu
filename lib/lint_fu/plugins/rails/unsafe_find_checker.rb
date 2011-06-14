@@ -1,6 +1,6 @@
 module LintFu::Plugins
   module Rails
-    class UnsafeFind < LintFu::Issue
+    class UnsafeFind < LintFu::Core::Issue
       def initialize(scan, file, sexp, subject)
         super(scan, file, sexp)
         @subject = subject
@@ -55,7 +55,7 @@ EOF
     # Visit a Rails controller looking for ActiveRecord finders being called in a way that
     # might allow an attacker to perform unauthorized operations on resources, e.g. creating,
     # updating or deleting someone else's records.
-    class UnsafeFindChecker < LintFu::Checker
+    class UnsafeFindChecker < LintFu::Core::Checker
       FINDER_REGEXP  = /^(find|first|all)(_or_initialize)?(_by_.*_id)?/
       #TODO: make this tunable, also expose it to the user to make sure it's appropriate!!
       SAFE_INSTANCE_METHODS = [:current_user, :current_account]

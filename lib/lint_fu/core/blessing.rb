@@ -1,4 +1,4 @@
-module LintFu
+module LintFu::Core
   class Blessing
     VERBOSE_BLESSING_COMMENT = /#\s*(lint|security)\s*[-:]\s*not\s*a?n?\s*([a-z0-9 ]*?) ?(as|because|;)\s*(.*)\s*/i
     BLESSING_COMMENT         = /#\s*(lint|security)\s*[-:]\s*not\s*a?n?\s*([a-z0-9 ]*?)\s*/i

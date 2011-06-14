@@ -12,7 +12,7 @@ module LintFu::CLI
 
       #Using the model we built, scan the controllers for security bugs.
       timed("Scan the application") do
-        @scan = LintFu::Scan.new(self.app_root)
+        @scan = LintFu::Core::Scan.new(self.app_root)
         #TODO generalize/abstract this, same as we did for context builders
         builder = LintFu::Plugins::Rails.issue_builder_for(self.app_root)
         builder.build(@application, @scan)
@@ -27,7 +27,7 @@ module LintFu::CLI
 
         blessing_ranges = blessings.map do |triple|
           file, line, comment = triple[0], triple[1], triple[2]
-          next LintFu::FileRange.new(file, line, line, comment)
+          next LintFu::Core::FileRange.new(file, line, line, comment)
         end
       end
 
@@ -69,7 +69,7 @@ module LintFu::CLI
 
     def find_blessings(file, lines, results)
       lines.each_with_index do |line, i|
-        blessing = LintFu::Blessing.parse(line)
+        blessing = LintFu::Core::Blessing.parse(line)
         next if blessing.empty?
         results << [file, i+1, line] 
       end
