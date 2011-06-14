@@ -1,6 +1,6 @@
 module LintFu::Plugins
   module Rails
-    class ModelApplication
+    class ApplicationEidos
       attr_reader :fs_root
       
       include LintFu::EidosContainer

@@ -1,8 +1,11 @@
 Finish plugin architecture - only load the plugins that apply to a specific project dir
 
-Make CLI more elegant (options parsing, banner, help, etc)
-
 Create a Cucumber feature suite
+  * SQL injection
+  * Buggy eager load
+  * Suppression/blessing
+
+Create Core and Report modules
 
 Unify the "bless" and "suppress" features
   * make them live in the same place (Checker?)

@@ -1,9 +1,9 @@
 module LintFu::Plugins
   module Rails
-    class ModelApplicationFactory < LintFu::EidosBuilder
+    class ApplicationEidosBuilder < LintFu::EidosBuilder
       def initialize(fs_root)
         super
-        @application = ModelApplication.new(fs_root)
+        @application = ApplicationEidos.new(fs_root)
         self.eide << @application
       end
 
