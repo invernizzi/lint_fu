@@ -3,6 +3,8 @@ require 'tempfile'
 Given /^a Rails app$/ do
   if $app_root && File.directory?($app_root)
     Dir.chdir($app_root) do
+      #stage all changes so we can wipe them out
+      runshell('git add .')
       runshell('git reset --hard initial')
     end
   else
@@ -30,8 +32,10 @@ end
 
 Given /^a ([A-Z][\w:]+) model defined by$/ do |klass_name, body|
   base_klass = 'ActiveRecord::Base'
+  models_dir = File.join($app_root, 'app', 'models')
+  FileUtils.mkdir_p(models_dir)
   body = body.split("\n").map { |l| '  ' + l}
-  path = File.join($app_root, 'app', 'models', klass_name.underscore + '.rb')
+  path = File.join(models_dir, klass_name.underscore + '.rb')
   file = File.open(path, 'w')
   file.write <<EOS
 class #{klass_name} < #{base_klass}
@@ -43,6 +47,8 @@ end
 
 Given /^a ([A-Z][\w:]+) controller defined by$/ do |klass_name, body|
   klass_name = "#{klass_name.pluralize.camelize}Controller"
+  controllers_dir = File.join($app_root, 'app', 'controllers')
+  FileUtils.mkdir_p(controllers_dir)
 
   body = body.split("\n")
   #wrap code in a method definition if user didn't provide one
@@ -54,7 +60,7 @@ Given /^a ([A-Z][\w:]+) controller defined by$/ do |klass_name, body|
   #indentation for pretty printing (oooh!)
   body = body.map { |l| '  ' + l}
 
-  path = File.join($app_root, 'app', 'controllers', klass_name.underscore + '.rb')
+  path = File.join(controllers_dir, klass_name.underscore + '.rb')
   file = File.open(path, 'w')
   file.write <<EOS
 class #{klass_name} < ApplicationController

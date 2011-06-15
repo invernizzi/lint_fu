@@ -8,7 +8,7 @@ When /I run a scan/ do
   end
 end
 
-Then /^the scan should contain (no|an|[0-9+]) instances of ([A-Z][A-Za-z0-9]+)$/ do |count, type|
+Then /^the scan should contain (no|a|an|[0-9+]) instances? of ([A-Z][A-Za-z0-9]+)$/ do |count, type|
   count = case count
             when 'no': 0
             when 'an': 1
@@ -26,7 +26,7 @@ Then /^the scan should contain (no|an|[0-9+]) instances of ([A-Z][A-Za-z0-9]+)$/
   end
 end
 
-Then /^the scan should contain (no|an|[0-9+]) ?(total|genuine|blessed)? issues?$/ do |count, kind|
+Then /^the scan should contain (no|a|an|[0-9+]) ?(total|genuine|blessed)? issues?$/ do |count, kind|
   count = case count
             when 'no': 0
             when 'an': 1

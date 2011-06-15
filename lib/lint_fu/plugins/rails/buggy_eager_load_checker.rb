@@ -65,7 +65,6 @@ EOF
 
         #no options hash in arglist? no problem!
         return nil unless (options = arglist.last).is_a?(Hash)
-
         does_eager_loading = options.has_key?(:include)
         has_complexity_prone_params =
                 options.has_key?(:conditions) ||
@@ -77,6 +76,7 @@ EOF
         return nil unless does_eager_loading && has_complexity_prone_params
         
         gather_includes(arglist.last[:include]).each do |inc|
+          inc.inspect
           plural     = inc.to_s
           singular   = plural.singularize
           class_name = singular.camelize

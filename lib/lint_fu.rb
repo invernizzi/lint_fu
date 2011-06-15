@@ -5,6 +5,7 @@ require 'sexp_processor'
 require 'ruby2ruby'
 require 'active_support'
 require 'active_support/core_ext/string/inflections'
+require 'active_support/inflections'
 require 'builder'
 require 'redcloth'
 
