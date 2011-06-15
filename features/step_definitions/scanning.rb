@@ -20,7 +20,7 @@ Then /^the scan should contain (no|an|[0-9+]) instances of ([A-Z][A-Za-z0-9]+)$/
     selected_issues.size.should == count
   rescue Exception => e
     selected_issues.each do |issue|
-      puts ("Issue at line #{issue.sexp.line}: #{issue.sexp}")
+      Cucumber.logger.debug("Issue at line #{issue.sexp.line}: #{issue.sexp.to_ruby_string}\n")
     end
     raise e
   end

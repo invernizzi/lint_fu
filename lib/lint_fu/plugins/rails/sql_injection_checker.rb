@@ -104,11 +104,11 @@ EOF
         tainted_params = []
 
         #Find potentially-tainted members of the arglist's options hash(es)
-        hash_params = arglist.find_all_recursively { |se| (Sexp === se) && (se[0] == :hash) }
+        hash_params = arglist.find_all_recursively { |se| se.is_a?(Sexp) && (se[0] == :hash) }
         hash_params ||= []
         
         hash_params.each do |hash|
-          hash = hash.clone
+          hash = hash.deep_clone
           hash.shift #get rid of the leading :hash marker
 
           #Iterate through the hash sexp, searching for keys whose values are known
