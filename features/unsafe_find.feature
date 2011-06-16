@@ -24,6 +24,7 @@ Feature: unsafe find
     @user = User.all(:conditions=>['age < ?', 5])
     @user = User.first(:conditions=>{:company_id=>current_user.company})
     @company = Company.first(:conditions=>{:owner_id=>current_user.id})
+    @outside_users = User.find_outside_of_company(current_user.company)
     """
     When I run a scan
     Then the scan should contain no issues

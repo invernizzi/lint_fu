@@ -4,6 +4,17 @@ module LintFu::Core
 
     attr_reader :scan, :context, :file
 
+    @@subclasses = Set.new
+
+    # Inherited callback to ensure this base class knows about all derived classes.
+    def self.inherited(base)
+      @@subclasses << base
+    end
+
+    def self.subclasses
+      @@subclasses
+    end
+
     def initialize(scan, context, file=nil)
       @scan       = scan
       @context    = context

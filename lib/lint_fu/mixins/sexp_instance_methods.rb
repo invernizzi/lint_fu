@@ -63,6 +63,12 @@ module LintFu
         typ = self[0]
 
         case typ
+          when :call
+            target = self[1]
+            method = self[2]
+            params = self[3]
+            return target.respond_to?(:constant?) && target.constant? &&
+                   params.respond_to?(:constant?) && params.constant?
           when :true, :false, :lit, :str
             return true
           when :array, :arglist

@@ -19,6 +19,7 @@ module LintFu::Plugins
           visitor.observers << BuggyEagerLoadChecker.new(scan, context, filename)
           visitor.observers << SqlInjectionChecker.new(scan, context, filename)
           visitor.observers << UnsafeFindChecker.new(scan, context, filename)
+          visitor.observers << LogInformationLeakChecker.new(scan, context, filename)
           visitor.process(sexp)
         end
 
@@ -27,8 +28,10 @@ module LintFu::Plugins
           sexp = LintFu::Parser.parse_ruby(filename)
           visitor = LintFu::Core::Visitor.new
           visitor.observers << SqlInjectionChecker.new(scan, context, filename, 0.2)
-          visitor.observers << UnsafeFindChecker.new(scan, context, filename)
-          visitor.process(sexp)          
+          #TODO re-enable these, but assign a much lower confidence -- also, it's slow!
+          #visitor.observers << UnsafeFindChecker.new(scan, context, filename)
+          #visitor.observers << LogInformationLeakChecker.new(scan, context, filename)
+          visitor.process(sexp)
         end
       end
     end
