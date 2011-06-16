@@ -1,4 +1,4 @@
-# Activate the various gems we depend on
+# Gemfile dependencies
 require 'trollop'
 require 'ruby_parser'
 require 'sexp_processor'
@@ -21,5 +21,6 @@ require 'lint_fu/reports'
 # Plugins
 require 'lint_fu/plugins'
 
-# Command-line interface
+# Domain-Specific Language and Command-Line Interface
+require 'lint_fu/dsl'
 require 'lint_fu/cli'

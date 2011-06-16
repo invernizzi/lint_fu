@@ -93,6 +93,30 @@ module LintFu
         end
       end
 
+      def match?(other)
+        return true if self.is_a?(SexpAny) || other.is_a?(SexpAny) || (other === SexpAny)
+
+        if [:size, :each].all? { |x| other.respond_to?(x) }
+          n = [self.size, other.size].min
+          (0...n).each do |i|
+            mine = self[i]
+            his  = other[i]
+
+            if mine == SexpAny || his == SexpAny || mine.is_a?(SexpAny) || other.is_a?(SexpAny)
+              #blindly accept; keep matching!
+            elsif his.is_a?(Sexp)
+              return false unless mine.is_a?(Sexp) && his.match?(mine)
+            else
+              return false unless mine == his
+            end
+          end
+
+          return true
+        else
+          return false
+        end
+      end
+
       def find_recursively(&test)
         return self if test.call(self)
 
@@ -114,6 +138,26 @@ module LintFu
 
         return nil if results.empty?
         return results
+      end
+
+      def replace(search, replace)
+        return replace if (self == search)
+
+        array = self.map do |x|
+          if (x == search)
+            next replace
+          elsif x.is_a?(Sexp)
+            if x.match(search)
+              next replace
+            else
+              next x.gsub(search, replace)
+            end
+          else
+            next x
+          end
+        end
+
+        return s(*array)
       end
 
       def preceding_comment_range
