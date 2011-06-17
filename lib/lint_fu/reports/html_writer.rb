@@ -1,4 +1,4 @@
-module LintFu::Reports
+module LintFu::Reports/
   class HtmlWriter < BaseWriter
     STYLESHEET = <<-EOF
       table { border: 2px solid black }
@@ -152,6 +152,7 @@ module LintFu::Reports
                 last    = issue.line + 3
                 excerpt = scm.excerpt(issue.file, (first..last), :blame=>false)
                 highlighted_code_snippet(div_issue, excerpt, first, issue.line)
+                not_an_issue_notice(div_issue, issue.issue_hash)
               end
             end
           end
@@ -179,6 +180,11 @@ module LintFu::Reports
 
     def highlighted_code_snippet(parent, snippet, first_line, highlight)
       parent.pre(snippet, :class=>"brush: ruby; first-line: #{first_line}; highlight: [#{highlight}]")
+    end
+
+    def not_an_issue_notice(parent, issue_hash)
+        parent.p "Is this a false positive? Insert this comment in the code to hide it in future reports:"
+        parent.pre "#security: not a #{issue_hash}"
     end
 
     def include_external_javascripts(head)
