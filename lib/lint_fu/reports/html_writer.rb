@@ -178,7 +178,7 @@ module LintFu::Reports
     end
 
     def highlighted_code_snippet(parent, snippet, first_line, highlight)
-      parent.pre(snippet, :class=>"brush: ruby; first-line: #{first_line + 1}; highlight: [#{highlight}]")
+      parent.pre(snippet, :class=>"brush: ruby; first-line: #{first_line}; highlight: [#{highlight}]")
     end
 
     def include_external_javascripts(head)
