@@ -1,4 +1,4 @@
-module LintFu::Reports/
+module LintFu::Reports
   class HtmlWriter < BaseWriter
     STYLESHEET = <<-EOF
       table { border: 2px solid black }
